@@ -1,0 +1,59 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+
+export default function DukkanAcma() {
+  const [dukkanAdi, setDukkanAdi] = useState("");
+  const [aciklama, setAciklama] = useState("");
+  const [adres, setAdres] = useState("");
+  const [telefon, setTelefon] = useState("");
+  const [kategori, setKategori] = useState("restaurant");
+
+  return (
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+      <Card className="w-full max-w-lg p-6 bg-white shadow-lg rounded-2xl">
+        <h2 className="text-2xl font-bold mb-4 text-center">Dükkan Aç</h2>
+        <CardContent className="space-y-4">
+          <Input
+            placeholder="Dükkan Adı"
+            value={dukkanAdi}
+            onChange={(e) => setDukkanAdi(e.target.value)}
+          />
+          <Textarea
+            placeholder="Açıklama (Opsiyonel)"
+            value={aciklama}
+            onChange={(e) => setAciklama(e.target.value)}
+          />
+          <Input
+            placeholder="Adres"
+            value={adres}
+            onChange={(e) => setAdres(e.target.value)}
+          />
+          <Input
+            placeholder="Telefon Numarası"
+            value={telefon}
+            onChange={(e) => setTelefon(e.target.value)}
+          />
+          <Select value={kategori} onValueChange={setKategori}>
+            <Select.Trigger className="w-full">
+              <span>{kategori}</span>
+            </Select.Trigger>
+            <Select.Content>
+              <Select.Item value="restaurant">Restoran</Select.Item>
+              <Select.Item value="market">Market</Select.Item>
+              <Select.Item value="kafe">Kafe</Select.Item>
+              <Select.Item value="diger">Diğer</Select.Item>
+            </Select.Content>
+          </Select>
+          <div className="flex justify-between mt-4">
+            <Button variant="outline">İptal</Button>
+            <Button>Kaydet</Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
