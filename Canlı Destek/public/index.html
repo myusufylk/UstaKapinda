@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yardımcı Usta</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="header-content">
+                <img src="https://i.pravatar.cc/40" alt="Yardımcı Usta" class="profile-pic">
+                <h1>Yardımcı Usta</h1>
+            </div>
+            <div class="header-actions">
+                <button id="adminLoginBtn" onclick="loginAsAdmin()">Admin Girişi</button>
+                <button id="sendSystemMessageBtn" onclick="sendSystemMessage()" style="display: none;">Sistem Mesajı Gönder</button>
+                <button id="themeToggle">🌙</button>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <!-- Mesajlar buraya gelecek -->
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <span>Kullanıcı yazıyor...</span>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="input-actions">
+                <button id="emojiButton" class="action-button">
+                    <i class="far fa-smile"></i>
+                </button>
+                <label for="fileInput" class="action-button">
+                    <i class="far fa-image"></i>
+                </label>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            </div>
+            <input type="text" id="messageInput" placeholder="Mesajınızı yazın...">
+            <button id="sendButton">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
