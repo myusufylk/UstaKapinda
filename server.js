@@ -290,8 +290,10 @@ io.on('connection', (socket) => {
     socket.on('chat message', (msg) => {
         console.log('Mesaj: ' + msg);
         
-        // Mesajı sadece gönderen kullanıcıya gönder
-        socket.emit('chat message', { type: 'user', text: msg });
+        // Sadece teknik olmayan mesajları göster
+        if (!msg.match(/^[MSRV]-/)) {
+            socket.emit('chat message', { type: 'user', text: msg });
+        }
 
         const lowerMsg = msg.toLowerCase().trim();
         const userState = userStates.get(socket.id) || {};
@@ -339,6 +341,11 @@ io.on('connection', (socket) => {
                 return;
             } else if (number === '1') {
                 socket.emit('chat message', { 
+                    type: 'user', 
+                    text: 'Seçilen menü: 1 - Araç servis hizmetlerimiz'
+                });
+                
+                socket.emit('chat message', { 
                     type: 'bot', 
                     text: 'Hangi araç servis hizmeti hakkında bilgi almak istersiniz?'
                 });
@@ -355,6 +362,11 @@ io.on('connection', (socket) => {
                 }, 500);
                 return;
             } else if (number === '2') {
+                socket.emit('chat message', { 
+                    type: 'user', 
+                    text: 'Seçilen menü: 2 - Randevu bilgisi almak istiyorum'
+                });
+                
                 const userAppointments = appointments[userState.phoneNumber] || [];
                 if (userAppointments.length === 0) {
                     socket.emit('chat message', {
@@ -385,6 +397,11 @@ io.on('connection', (socket) => {
                 }, 500 * (userAppointments.length + 1));
                 return;
             } else if (number === '3') {
+                socket.emit('chat message', { 
+                    type: 'user', 
+                    text: 'Seçilen menü: 3 - Servis Merkezi Değerlendirmeleri'
+                });
+                
                 socket.emit('chat message', { 
                     type: 'bot', 
                     text: 'Hangi servis merkezinin değerlendirmelerini görmek istersiniz?'
@@ -444,6 +461,160 @@ io.on('connection', (socket) => {
             }
         }
 
+        // Hizmet seçimlerini kontrol et
+        const serviceMatch = msg.match(/S-(\d+)/);
+        if (serviceMatch) {
+            const [_, number] = serviceMatch;
+            const serviceTypes = ['periyodik', 'motor', 'fren', 'yağ', 'lastik', 'elektrik', 'klima', 'kaporta'];
+            const serviceNames = {
+                'periyodik': 'Periyodik Bakım',
+                'motor': 'Motor Bakımı',
+                'fren': 'Fren Sistemi Bakımı',
+                'yağ': 'Yağ Değişimi',
+                'lastik': 'Lastik Değişimi ve Bakımı',
+                'elektrik': 'Elektrik Sistemi Bakımı',
+                'klima': 'Klima Bakımı',
+                'kaporta': 'Kaporta ve Boya'
+            };
+            const selectedService = serviceTypes[number - 1];
+            
+            if (selectedService && autoResponses[selectedService]) {
+                socket.emit('chat message', { 
+                    type: 'user', 
+                    text: `Seçilen hizmet: ${number} - ${serviceNames[selectedService]}`
+                });
+                
+                const response = autoResponses[selectedService];
+                socket.emit('chat message', { 
+                    type: 'bot', 
+                    text: response.response
+                });
+                
+                // Kullanıcı durumunu güncelle
+                userStates.set(socket.id, { 
+                    ...userState,
+                    waitingForCarInfo: true,
+                    waitingForVehicleType: false,
+                    lastService: selectedService
+                });
+                return;
+            }
+        }
+
+        // Marka ve model bilgisi kontrolü
+        if (userState.waitingForCarInfo) {
+            const serviceType = userState.lastService;
+            const serviceNames = {
+                'periyodik': 'Periyodik Bakım',
+                'motor': 'Motor Bakımı',
+                'fren': 'Fren Sistemi Bakımı',
+                'yağ': 'Yağ Değişimi',
+                'lastik': 'Lastik Değişimi ve Bakımı',
+                'elektrik': 'Elektrik Sistemi Bakımı',
+                'klima': 'Klima Bakımı',
+                'kaporta': 'Kaporta ve Boya'
+            };
+            
+            // Araç tipi seçeneklerini göster
+            socket.emit('chat message', {
+                type: 'bot',
+                text: 'Lütfen aracınızın tipini seçin:'
+            });
+            
+            vehicleTypeOptions.forEach(option => {
+                socket.emit('chat message', {
+                    type: 'bot',
+                    text: option.text,
+                    isButton: true,
+                    value: option.value
+                });
+            });
+
+            // Kullanıcı durumunu güncelle
+            userStates.set(socket.id, {
+                ...userState,
+                waitingForCarInfo: false,
+                waitingForVehicleType: true,
+                lastService: serviceType,
+                carInfo: msg
+            });
+            return;
+        }
+
+        // Araç tipi seçimi kontrolü
+        if (userState.waitingForVehicleType) {
+            const vehicleTypeMatch = msg.match(/V-(\d+)/);
+            if (vehicleTypeMatch) {
+                const [_, number] = vehicleTypeMatch;
+                const vehicleType = vehicleTypeMap[`V-${number}`];
+                const vehicleTypeNames = {
+                    'binek': 'Binek Araç',
+                    'suv': 'SUV',
+                    'ticari': 'Ticari Araç',
+                    'motosiklet': 'Motosiklet',
+                    'kamyon': 'Kamyon',
+                    'minibüs': 'Minibüs'
+                };
+                const serviceType = userState.lastService;
+                const serviceNames = {
+                    'periyodik': 'Periyodik Bakım',
+                    'motor': 'Motor Bakımı',
+                    'fren': 'Fren Sistemi Bakımı',
+                    'yağ': 'Yağ Değişimi',
+                    'lastik': 'Lastik Değişimi ve Bakımı',
+                    'elektrik': 'Elektrik Sistemi Bakımı',
+                    'klima': 'Klima Bakımı',
+                    'kaporta': 'Kaporta ve Boya'
+                };
+                const carInfo = userState.carInfo;
+                const serviceTypes = ['periyodik', 'motor', 'fren', 'yağ', 'lastik', 'elektrik', 'klima', 'kaporta'];
+                const serviceIndex = serviceTypes.indexOf(serviceType) + 1;
+                const priceRange = priceRanges[`P-${serviceIndex}`];
+
+                socket.emit('chat message', { 
+                    type: 'user', 
+                    text: `Seçilen araç tipi: ${number} - ${vehicleTypeNames[vehicleType]}`
+                });
+
+                socket.emit('chat message', {
+                    type: 'bot',
+                    text: `Teşekkürler! ${carInfo} (${vehicleTypeNames[vehicleType]}) aracınız için ${serviceNames[serviceType]} hizmetimiz ${priceRange.min} TL ile ${priceRange.max} TL arasında değişmektedir. Size en yakın servis merkezlerimiz:`
+                });
+
+                // Uygun servis merkezlerini bul
+                const suitableShops = Object.entries(registeredShops)
+                    .filter(([_, shop]) => shop.services.includes(serviceType) && shop.vehicleTypes.includes(vehicleType))
+                    .map(([name, shop]) => `${name}\n📍 ${shop.address}\n📞 ${shop.phone}\n⭐ ${shop.rating}\n🚗 ${shop.distance}`);
+
+                setTimeout(() => {
+                    suitableShops.forEach(shop => {
+                        socket.emit('chat message', {
+                            type: 'bot',
+                            text: shop
+                        });
+                    });
+                }, 500);
+
+                setTimeout(() => {
+                    socket.emit('chat message', {
+                        type: 'bot',
+                        text: '🔙 Ana menüye dön',
+                        isButton: true,
+                        value: 'M-0'
+                    });
+                }, 500 * (suitableShops.length + 1));
+
+                // Kullanıcı durumunu sıfırla
+                userStates.set(socket.id, {
+                    ...userState,
+                    waitingForVehicleType: false,
+                    lastService: null,
+                    carInfo: null
+                });
+                return;
+            }
+        }
+
         // Ana menüye dönüş
         if (lowerMsg.includes('ana menü') || lowerMsg.includes('üst menü') || lowerMsg === '9') {
             const mainResponse = autoResponses['1'];
@@ -468,23 +639,25 @@ io.on('connection', (socket) => {
         }
 
         // Tanınmayan mesajlar için
-        socket.emit('chat message', { 
-            type: 'bot', 
-            text: 'Üzgünüm, sizi anlayamadım. Lütfen menüden bir seçenek seçin.'
-        });
-        
-        // Ana menü seçeneklerini göster
-        setTimeout(() => {
-            const mainResponse = autoResponses['1'];
-            mainResponse.options.forEach(option => {
-                socket.emit('chat message', { 
-                    type: 'bot', 
-                    text: option.text,
-                    isButton: true,
-                    value: option.value
-                });
+        if (!userState.waitingForVehicleType && !userState.waitingForCarInfo) {
+            socket.emit('chat message', { 
+                type: 'bot', 
+                text: 'Üzgünüm, sizi anlayamadım. Lütfen menüden bir seçenek seçin.'
             });
-        }, 500);
+            
+            // Ana menü seçeneklerini göster
+            setTimeout(() => {
+                const mainResponse = autoResponses['1'];
+                mainResponse.options.forEach(option => {
+                    socket.emit('chat message', { 
+                        type: 'bot', 
+                        text: option.text,
+                        isButton: true,
+                        value: option.value
+                    });
+                });
+            }, 500);
+        }
     });
 
     // Kullanıcı bağlantısı kesildiğinde
