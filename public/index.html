@@ -3,211 +3,590 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UstaKapında</title>
+    <title>UstaKapında - Araç Servisi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #1557b0;
+            --background-color: #f0f2f5;
+            --text-color: #333;
+            --light-text: #666;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f0f2f5;
+            background: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
         }
-        .header {
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin-bottom: 30px;
-            gap: 15px;
+            gap: 10px;
         }
-        .profile {
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .logo h1 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 0 4rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: white;
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Services Section */
+        .services {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .service-card i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        /* Canlı Destek Styles */
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .chat-button {
             width: 60px;
             height: 60px;
-            background: #1a73e8;
+            background: var(--primary-color);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 24px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.3s;
         }
-        .title-container {
-            text-align: center;
+
+        .chat-button:hover {
+            transform: scale(1.1);
         }
-        h1 {
-            color: #1a73e8;
-            margin: 0;
-        }
-        .subtitle {
-            color: #666;
-            font-size: 16px;
-            margin-top: 5px;
-        }
-        #messages {
+
+        .chat-container {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 350px;
             height: 500px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-container.active {
+            display: flex;
+        }
+
+        .chat-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .close-chat {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
             overflow-y: auto;
-            border: 1px solid #e0e0e0;
-            padding: 20px;
-            margin-bottom: 20px;
-            background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: #f9f9f9;
         }
-        #messages::-webkit-scrollbar {
-            width: 8px;
-        }
-        #messages::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        #messages::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-        #messages::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
+
         .message {
             margin: 10px 0;
-            padding: 12px 15px;
+            padding: 10px 15px;
             border-radius: 15px;
             max-width: 80%;
             word-wrap: break-word;
-            position: relative;
-            animation: fadeIn 0.3s ease-in-out;
         }
+
         .message.user {
-            background: #1a73e8;
+            background: var(--primary-color);
             color: white;
             margin-left: auto;
             border-bottom-right-radius: 5px;
         }
+
         .message.bot {
             background: #e9ecef;
-            color: #212529;
+            color: var(--text-color);
             margin-right: auto;
             border-bottom-left-radius: 5px;
         }
-        .message.bot.option {
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .message.bot.option:hover {
-            background: #d4d8dc;
-        }
-        .message.bot::before {
-            content: '🤖';
-            margin-right: 5px;
-        }
-        #form {
+
+        .chat-input {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #eee;
             display: flex;
             gap: 10px;
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        #input {
+
+        .chat-input input {
             flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 16px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
             outline: none;
-            transition: border-color 0.3s;
         }
-        #input:focus {
-            border-color: #1a73e8;
-        }
-        button {
-            padding: 12px 25px;
-            background: #1a73e8;
+
+        .chat-input button {
+            padding: 10px 20px;
+            background: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
         }
-        button:hover {
-            background: #1557b0;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+
+            nav ul {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .hero {
+                padding: 6rem 0 3rem;
+            }
+
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .chat-container {
+                width: 100%;
+                height: 100%;
+                bottom: 0;
+                right: 0;
+                border-radius: 0;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .services-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .services-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="profile">
-            <i class="fas fa-tools"></i>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-car"></i>
+                <h1>UstaKapında</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#hizmetler">Hizmetlerimiz</a></li>
+                    <li><a href="#iletisim">İletişim</a></li>
+                </ul>
+            </nav>
         </div>
-        <div class="title-container">
-            <h1>UstaKapında</h1>
-            <div class="subtitle">Usta Kapında yardımcı botunuz</div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h2>Aracınız İçin Profesyonel Servis Hizmeti</h2>
+            <p>Uzman ekibimiz ve modern ekipmanlarımızla aracınızın bakımını en iyi şekilde yapıyoruz.</p>
+            <a href="#" class="cta-button">Hemen Randevu Al</a>
+        </div>
+    </section>
+
+    <section class="services" id="hizmetler">
+        <div class="container">
+            <h2 class="section-title">Hizmetlerimiz</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <i class="fas fa-tools"></i>
+                    <h3>Periyodik Bakım</h3>
+                    <p>Aracınızın düzenli bakımı için komple kontrol ve bakım hizmeti</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-car-battery"></i>
+                    <h3>Motor Bakımı</h3>
+                    <p>Motor performansı ve ömrü için detaylı bakım ve onarım</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-car-crash"></i>
+                    <h3>Fren Sistemi</h3>
+                    <p>Fren sistemi kontrolü, bakımı ve parça değişimi</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-oil-can"></i>
+                    <h3>Yağ Değişimi</h3>
+                    <p>Motor yağı ve filtre değişimi hizmeti</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-car-side"></i>
+                    <h3>Lastik Servisi</h3>
+                    <p>Lastik değişimi, rotasyon ve balans ayarı</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Elektrik Sistemi</h3>
+                    <p>Araç elektrik sistemi kontrolü ve onarımı</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-snowflake"></i>
+                    <h3>Klima Bakımı</h3>
+                    <p>Klima sistemi bakımı ve gaz dolumu</p>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-spray-can"></i>
+                    <h3>Kaporta ve Boya</h3>
+                    <p>Kaporta onarımı ve boya işlemleri</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-section">
+                <h3>UstaKapında</h3>
+                <p>Profesyonel hizmet, güvenilir çözümler.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Hızlı Bağlantılar</h3>
+                <ul>
+                    <li><a href="#anasayfa">Ana Sayfa</a></li>
+                    <li><a href="#hizmetler">Hizmetler</a></li>
+                    <li><a href="#hakkimizda">Hakkımızda</a></li>
+                    <li><a href="#iletisim">İletişim</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>İletişim</h3>
+                <ul>
+                    <li><i class="fas fa-phone"></i> +90 555 123 4567</li>
+                    <li><i class="fas fa-envelope"></i> info@ustakapinda.com</li>
+                    <li><i class="fas fa-map-marker-alt"></i> İstanbul, Türkiye</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Canlı Destek Widget -->
+    <div class="chat-widget">
+        <div class="chat-button" id="openChat">
+            <i class="fas fa-comments"></i>
+        </div>
+        <div class="chat-container" id="chatContainer">
+            <div class="chat-header">
+                <h3>Canlı Destek</h3>
+                <button class="close-chat" id="closeChat">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="Mesajınızı yazın...">
+                <button id="sendMessage">Gönder</button>
+            </div>
         </div>
     </div>
-    <div id="messages"></div>
-    <form id="form">
-        <input id="input" autocomplete="off" placeholder="Mesajınızı yazın..." />
-        <button>Gönder</button>
-    </form>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
+        // Canlı Destek İşlevselliği
         const socket = io();
-        const messages = document.getElementById('messages');
-        const form = document.getElementById('form');
-        const input = document.getElementById('input');
+        const chatButton = document.getElementById('openChat');
+        const chatContainer = document.getElementById('chatContainer');
+        const closeChat = document.getElementById('closeChat');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendMessage');
 
-        // Mesaj gönderme fonksiyonu
-        function sendMessage(message) {
+        // Kullanıcı durumunu takip etmek için
+        let currentState = 'initial';
+
+        chatButton.addEventListener('click', () => {
+            chatContainer.classList.add('active');
+            // İlk mesajı gönder
+            if (currentState === 'initial') {
+                addBotMessage('Merhaba! UstaKapında Araç Servisi\'ne hoş geldiniz! Size nasıl yardımcı olabilirim?');
+                showOptions([
+                    { text: '1️⃣ Araç servis hizmetlerimiz', value: '1' },
+                    { text: '2️⃣ Randevu bilgisi almak istiyorum', value: '2' },
+                    { text: '3️⃣ Servis Merkezi Değerlendirmeleri', value: '3' }
+                ]);
+            }
+        });
+
+        closeChat.addEventListener('click', () => {
+            chatContainer.classList.remove('active');
+        });
+
+        function addMessage(text, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addBotMessage(text) {
+            addMessage(text, false);
+        }
+
+        function showOptions(options) {
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'options-container';
+            
+            options.forEach(option => {
+                const optionButton = document.createElement('button');
+                optionButton.className = 'option-button';
+                optionButton.textContent = option.text;
+                optionButton.onclick = () => handleOptionClick(option.value);
+                optionsDiv.appendChild(optionButton);
+            });
+            
+            chatMessages.appendChild(optionsDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function handleOptionClick(value) {
+            chatInput.value = value;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
             if (message) {
                 socket.emit('chat message', message);
-                input.value = '';
+                addMessage(message, true);
+                chatInput.value = '';
             }
         }
 
-        // Mesaj ekleme fonksiyonu
-        function addMessage(data) {
-            const item = document.createElement('div');
-            item.textContent = data.text;
-            
-            if (data.type === 'bot' && data.isButton) {
-                item.className = 'message bot option';
-                // Tıklama olayı ekle
-                item.addEventListener('click', () => {
-                    if (data.value) {
-                        sendMessage(data.value);
-                    }
-                });
-            } else {
-                item.className = `message ${data.type}`;
-            }
-            
-            messages.appendChild(item);
-            messages.scrollTop = messages.scrollHeight;
-        }
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const message = input.value.trim();
-            if (message) {
-                sendMessage(message);
+        sendButton.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
             }
         });
 
         socket.on('chat message', (data) => {
-            addMessage(data);
+            if (data.response) {
+                addBotMessage(data.response);
+            }
+            if (data.options && data.options.length > 0) {
+                showOptions(data.options);
+            }
         });
+
+        // Stil eklemeleri
+        const style = document.createElement('style');
+        style.textContent = `
+            .options-container {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin: 10px 0;
+            }
+            
+            .option-button {
+                background: #e9ecef;
+                border: none;
+                padding: 10px 15px;
+                border-radius: 15px;
+                cursor: pointer;
+                text-align: left;
+                transition: background-color 0.3s;
+            }
+            
+            .option-button:hover {
+                background: #d4d8dc;
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
