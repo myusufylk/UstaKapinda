@@ -106,6 +106,7 @@ const messageRoutes = require('./routes/messages');
 const notificationRoutes = require('./routes/notifications');
 const paymentRoutes = require('./routes/payments');
 const reviewRoutes = require('./routes/reviews');
+const notificationPreferencesRouter = require('./routes/notificationPreferences');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -116,6 +117,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/notification-preferences', notificationPreferencesRouter);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
