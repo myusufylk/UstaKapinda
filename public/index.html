@@ -1,12 +1,39 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Usta Kapında</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usta Kapında</title>
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <h1>Usta Kapında Projesi</h1>
-  <p>Hoş geldiniz!</p>
+    <h1>Usta Kapında Projesi</h1>
+    <p>Hoş geldiniz!</p>
+
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+        <button class="chatbot-emoji" type="button">
+            <span>💬</span>
+        </button>
+        <div class="chatbot-window">
+            <div class="chatbot-header">
+                <span>UstaKapında Asistanı</span>
+                <button class="close-btn" type="button">×</button>
+            </div>
+            <div class="chatbot-body">
+                <div class="chat-messages">
+                    <div class="message bot">
+                        Merhaba! Ben UstaKapında asistanıyım. Size nasıl yardımcı olabilirim?
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" placeholder="Mesajınızı yazın...">
+                    <button type="button" onclick="sendMessage()">Gönder</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/script.js"></script>
 </body>
 </html>

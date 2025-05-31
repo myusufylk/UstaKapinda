@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const NotificationPreference = require('../models/NotificationPreference');
-const auth = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 
 // Bildirim tercihlerini getir
 router.get('/', auth, async (req, res) => {
