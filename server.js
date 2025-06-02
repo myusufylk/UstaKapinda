@@ -122,6 +122,11 @@ app.use('/api/notification-preferences', notificationPreferencesRouter);
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Statik dosya servisi (public klasörü kaldırıldıktan sonra ana dizindeki index.html'i göstermek için)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);

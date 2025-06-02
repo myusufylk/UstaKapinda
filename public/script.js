@@ -1,496 +1,548 @@
-// Chatbot işlevselliği
-let isChatOpen = false;
-let currentScenario = null;
-let selectedService = null;
-let selectedShop = null;
-let selectedDate = null;
-let selectedTime = null;
+// Ana sayfa için ek JS kodu gerekirse buraya eklenebilir.
+// Şu an için ekstra bir işlev yok.
 
-// Örnek dükkan verileri
-const shops = {
-    periyodik: [
-        { id: 1, name: "Oto Bakım Merkezi", address: "Atatürk Cad. No:123", rating: 4.8, distance: "2.5 km", phone: "0212 555 0001" },
-        { id: 2, name: "Hızlı Servis", address: "İstiklal Cad. No:45", rating: 4.5, distance: "3.1 km", phone: "0212 555 0002" },
-        { id: 3, name: "Güvenilir Oto", address: "Bağdat Cad. No:78", rating: 4.7, distance: "4.2 km", phone: "0212 555 0003" }
-    ],
-    motor: [
-        { id: 1, name: "Motor Uzmanı", address: "Eskişehir Yolu No:156", rating: 4.9, distance: "1.8 km", phone: "0212 555 0004" },
-        { id: 2, name: "Teknik Servis", address: "Ankara Cad. No:89", rating: 4.6, distance: "2.3 km", phone: "0212 555 0005" }
-    ],
-    kaporta: [
-        { id: 1, name: "Kaporta & Boya", address: "Diyarbakır Cad. No:234", rating: 4.7, distance: "3.5 km", phone: "0212 555 0006" },
-        { id: 2, name: "Renk Ustası", address: "Samsun Cad. No:67", rating: 4.8, distance: "2.9 km", phone: "0212 555 0007" }
-    ],
-    lastik: [
-        { id: 1, name: "Lastik Dünyası", address: "Konya Cad. No:345", rating: 4.6, distance: "1.5 km", phone: "0212 555 0008" },
-        { id: 2, name: "Jant & Lastik", address: "Antalya Cad. No:90", rating: 4.5, distance: "2.7 km", phone: "0212 555 0009" }
-    ],
-    elektronik: [
-        { id: 1, name: "Elektronik Sistemler", address: "Bursa Cad. No:456", rating: 4.8, distance: "3.2 km", phone: "0212 555 0010" },
-        { id: 2, name: "Oto Elektronik", address: "İzmir Cad. No:123", rating: 4.7, distance: "2.1 km", phone: "0212 555 0011" }
-    ]
-};
-
-// Randevu saatleri
-const availableHours = [
-    "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-    "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
-    "16:00", "16:30", "17:00", "17:30"
-];
-
-// Yardım senaryoları
-const scenarios = {
-    start: {
-        message: "Merhaba! Ben UstaKapında asistanıyım. Size nasıl yardımcı olabilirim?",
-        options: [
-            { text: "Hizmetler hakkında bilgi almak istiyorum", next: "services" },
-            { text: "Şikayet/Öneri bildirmek istiyorum", next: "feedback" }
-        ]
-    },
-    services: {
-        message: "Size sunduğumuz araç bakım ve onarım hizmetleri:",
-        options: [
-            { text: "Periyodik Bakım", next: "service_detail", service: "periyodik" },
-            { text: "Motor Tamiri", next: "service_detail", service: "motor" },
-            { text: "Kaporta & Boya", next: "service_detail", service: "kaporta" },
-            { text: "Lastik & Jant", next: "service_detail", service: "lastik" },
-            { text: "Elektronik Sistemler", next: "service_detail", service: "elektronik" },
-            { text: "Ana Menüye Dön", next: "start" }
-        ]
-    },
-    service_detail: {
-        message: function(service) {
-            selectedService = service;
-            const details = {
-                periyodik: "Periyodik bakım hizmetlerimiz: Yağ değişimi, filtre değişimi, fren kontrolü, sıvı kontrolleri, genel kontrol ve bakım. Tüm marka ve modeller için hizmet.",
-                motor: "Motor tamir hizmetlerimiz: Motor arıza tespiti, tamir ve bakım, turbo sistemleri, yakıt sistemi, soğutma sistemi ve egzoz sistemi tamirleri.",
-                kaporta: "Kaporta ve boya hizmetlerimiz: Çarpışma tamiri, boya işlemleri, kaporta düzeltme, çizik giderme, korozyon önleme ve koruma işlemleri.",
-                lastik: "Lastik ve jant hizmetlerimiz: Lastik değişimi, balans ayarı, rot ayarı, jant tamiri, lastik tamiri ve lastik saklama hizmetleri.",
-                elektronik: "Elektronik sistem hizmetlerimiz: OBD arıza tespiti, sensör tamirleri, klima sistemleri, güvenlik sistemleri, navigasyon ve multimedya sistemleri tamiri."
-            };
-            return details[service] || "Bu hizmet hakkında detaylı bilgi için lütfen bizimle iletişime geçin.";
-        },
-        options: [
-            { text: "Bu hizmet için randevu almak istiyorum", next: "car_info" },
-            { text: "Ana Menüye Dön", next: "start" }
-        ]
-    },
-    car_info: {
-        message: "Lütfen aracınızın bilgilerini girin:",
-        input: true,
-        fields: [
-            { name: "marka", label: "Araç Markası" },
-            { name: "model", label: "Araç Modeli" },
-            { name: "yil", label: "Model Yılı" }
-        ],
-        next: "shop_list"
-    },
-    shop_list: {
-        message: function(carInfo) {
-            const serviceShops = shops[selectedService] || [];
-            if (serviceShops.length === 0) {
-                return "Üzgünüm, bu hizmet için yakınınızda dükkan bulunamadı.";
-            }
-
-            let message = `${carInfo.marka} ${carInfo.model} (${carInfo.yil}) aracınız için yakınınızdaki dükkanlar:\n\n`;
-            serviceShops.forEach(shop => {
-                message += `🏪 ${shop.name}\n`;
-                message += `📍 ${shop.address}\n`;
-                message += `⭐ ${shop.rating} (${shop.distance})\n`;
-                message += `📞 ${shop.phone}\n\n`;
-            });
-            return message;
-        },
-        options: [
-            { text: "Randevu almak istiyorum", next: "appointment" },
-            { text: "Başka dükkanları göster", next: "more_shops" },
-            { text: "Ana Menüye Dön", next: "start" }
-        ]
-    },
-    more_shops: {
-        message: function() {
-            // Şimdilik örnek olarak daha fazla dükkan yoksa bilgilendir
-            return "Şu anda listelenenler dışında başka dükkan bulunmamaktadır. Daha fazla seçenek için lütfen daha sonra tekrar deneyin.";
-        },
-        options: [
-            { text: "Ana Menüye Dön", next: "start" }
-        ]
-    },
-    phone_appointment: {
-        message: "Telefonla randevu almak için lütfen aşağıdaki numarayı arayın:\n\n☎️ 0212 555 0012\n\nSize yardımcı olmaktan memnuniyet duyarız!",
-        options: [
-            { text: "Ana Menüye Dön", next: "start" }
-        ]
-    },
-    complaint: {
-        message: "Lütfen şikayetinizi aşağıya yazınız:",
-        input: true,
-        fields: [
-            { name: "complaintText", label: "Şikayetiniz" }
-        ],
-        next: "complaint_thanks"
-    },
-    complaint_thanks: {
-        message: "Şikayetiniz alınmıştır. Geri bildiriminiz için teşekkür ederiz!",
-        options: [
-            { text: "Ana Menüye Dön", next: "start" }
-        ]
-    },
-    suggestion: {
-        message: "Lütfen önerinizi aşağıya yazınız:",
-        input: true,
-        fields: [
-            { name: "suggestionText", label: "Öneriniz" }
-        ],
-        next: "suggestion_thanks"
-    },
-    suggestion_thanks: {
-        message: "Öneriniz alınmıştır. Geri bildiriminiz için teşekkür ederiz!",
-        options: [
-            { text: "Ana Menüye Dön", next: "start" }
-        ]
-    },
-    appointment: {
-        message: "Randevu almak için lütfen aşağıdaki seçeneklerden birini seçin:",
-        options: [
-            { text: "Online randevu oluştur", next: "select_shop" },
-            { text: "Telefonla randevu al", next: "phone_appointment" },
-            { text: "Ana Menüye Dön", next: "start" }
-        ]
-    },
-    select_shop: {
-        message: "Lütfen randevu almak istediğiniz dükkânı seçin:",
-        options: function() {
-            const serviceShops = shops[selectedService] || [];
-            return serviceShops.map(shop => ({
-                text: `${shop.name} (${shop.distance})`,
-                next: "select_date",
-                shop: shop
-            }));
-        }
-    },
-    select_date: {
-        message: "Lütfen randevu tarihini seçin:",
-        input: true,
-        type: "date",
-        next: "select_time"
-    },
-    select_time: {
-        message: "Lütfen randevu saatini seçin:",
-        input: true,
-        type: "time",
-        options: function() {
-            return availableHours.map(hour => ({
-                text: hour,
-                next: "confirm_appointment"
-            }));
-        }
-    },
-    confirm_appointment: {
-        message: function(data) {
-            return `Randevu bilgileriniz:\n\n` +
-                   `🏪 Dükkan: ${selectedShop.name}\n` +
-                   `📍 Adres: ${selectedShop.address}\n` +
-                   `📅 Tarih: ${selectedDate}\n` +
-                   `⏰ Saat: ${selectedTime}\n\n` +
-                   `Randevunuzu onaylıyor musunuz?`;
-        },
-        options: [
-            { text: "Evet, onaylıyorum", next: "appointment_confirmed" },
-            { text: "Hayır, iptal et", next: "start" }
-        ]
-    },
-    appointment_confirmed: {
-        message: "Randevunuz başarıyla oluşturuldu! Randevu detayları e-posta adresinize gönderilecektir. Başka bir konuda yardımcı olabilir miyim?",
-        options: [
-            { text: "Ana Menüye Dön", next: "start" }
-        ]
-    },
-    feedback: {
-        message: "Lütfen geri bildiriminizi seçin:",
-        options: [
-            { text: "Şikayet bildir", next: "complaint" },
-            { text: "Öneri bildir", next: "suggestion" },
-            { text: "Ana Menüye Dön", next: "start" }
-        ]
-    }
-};
-
-// Sayfa yüklendiğinde çalışacak fonksiyon
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Sayfa yüklendi, chatbot başlatılıyor...');
-    
-    // Chatbot penceresini başlangıçta gizle
+// Tüm event listener'ları tek bir DOMContentLoaded içinde toplayalım
+window.addEventListener('DOMContentLoaded', function() {
+    // Chatbot Widget
+    const chatbotContainer = document.querySelector('.chatbot-container');
+    const chatbotEmoji = document.querySelector('.chatbot-emoji');
     const chatbotWindow = document.querySelector('.chatbot-window');
-    if (chatbotWindow) {
-        chatbotWindow.style.display = 'none';
+    const closeChatbotBtn = document.querySelector('.close-btn');
+    const chatMessages = document.querySelector('.chat-messages');
+    const chatInput = document.querySelector('.chat-input input');
+    const sendChatMessage = document.getElementById('sendChatMessage');
+
+    if (chatbotEmoji && chatbotWindow) {
+        chatbotEmoji.addEventListener('click', () => {
+            chatbotWindow.style.display = 'block';
+        });
     }
 
-    // Emoji butonuna tıklama olayı ekle
-    const emojiButton = document.querySelector('.chatbot-emoji');
-    if (emojiButton) {
-        emojiButton.addEventListener('click', toggleChat);
-        console.log('Emoji butonu tıklama olayı eklendi');
+    if (closeChatbotBtn) {
+        closeChatbotBtn.addEventListener('click', () => {
+            chatbotWindow.style.display = 'none';
+        });
     }
 
-    // Kapatma butonuna tıklama olayı ekle
-    const closeButton = document.querySelector('.close-btn');
-    if (closeButton) {
-        closeButton.addEventListener('click', toggleChat);
-        console.log('Kapatma butonu tıklama olayı eklendi');
-    }
+    if (sendChatMessage && chatInput) {
+        sendChatMessage.addEventListener('click', () => {
+            const message = chatInput.value.trim();
+            if (message) {
+                // Kullanıcı mesajını ekle
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user';
+                userMessage.textContent = message;
+                chatMessages.appendChild(userMessage);
 
-    // Enter tuşu ile mesaj gönderme
-    const messageInput = document.querySelector('.chat-input input');
-    if (messageInput) {
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
+                // Chatbot yanıtını simüle et
+                setTimeout(() => {
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'message bot';
+                    botMessage.textContent = 'Üzgünüm, şu anda canlı destek temsilcimiz müsait değil. Lütfen daha sonra tekrar deneyin.';
+                    chatMessages.appendChild(botMessage);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+
+                chatInput.value = '';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         });
-        console.log('Enter tuşu olayı eklendi');
+
+        // Enter tuşu ile mesaj gönderme
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendChatMessage.click();
+            }
+        });
     }
 
-    // Takvim input'u için minimum tarih ayarla
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const minDate = tomorrow.toISOString().split('T')[0];
+    // Mesajlaşma Modalı
+    const messagesModal = document.getElementById('messagesModal');
+    const closeMessagesModal = document.getElementById('closeMessagesModal');
 
-    // Takvim input'larını güncelle
-    document.querySelectorAll('input[type="date"]').forEach(input => {
-        input.min = minDate;
+    if (closeMessagesModal && messagesModal) {
+        closeMessagesModal.addEventListener('click', () => {
+            messagesModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === messagesModal) {
+                messagesModal.style.display = 'none';
+            }
+        });
+    }
+
+    // Kullanıcı menüsü
+    const userMenu = document.querySelector('.user-menu');
+    const userMenuBtn = document.querySelector('.user-menu-btn');
+
+    if (userMenu && userMenuBtn) {
+        userMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userMenu.classList.toggle('open');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (!userMenu.contains(e.target)) {
+                userMenu.classList.remove('open');
+            }
+        });
+    }
+
+    // Kayıt ve Giriş Modalları
+    const registerModal = document.getElementById('registerModal');
+    const loginModal = document.getElementById('loginModal');
+    const openRegister = document.getElementById('openRegister');
+    const openLogin = document.getElementById('openLogin');
+    const closeRegisterModal = document.getElementById('closeRegisterModal');
+    const closeLoginModal = document.getElementById('closeLoginModal');
+    const typeBtns = document.querySelectorAll('.register-type-btn');
+    const shopOnlyFields = document.querySelectorAll('.shop-only');
+
+    if (openRegister && registerModal) {
+        openRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerModal.style.display = 'block';
+            if (userMenu) userMenu.classList.remove('open');
+        });
+    }
+
+    if (openLogin && loginModal) {
+        openLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.style.display = 'block';
+            if (userMenu) userMenu.classList.remove('open');
+        });
+    }
+
+    if (closeRegisterModal && registerModal) {
+        closeRegisterModal.addEventListener('click', () => {
+            registerModal.style.display = 'none';
+        });
+    }
+
+    if (closeLoginModal && loginModal) {
+        closeLoginModal.addEventListener('click', () => {
+            loginModal.style.display = 'none';
+        });
+    }
+
+    // Modal dışına tıklama
+    window.addEventListener('click', (e) => {
+        if (e.target === registerModal) {
+            registerModal.style.display = 'none';
+        }
+        if (e.target === loginModal) {
+            loginModal.style.display = 'none';
+        }
     });
 
-    // Başlangıç senaryosunu göster
-    showScenario('start');
-});
+    // Kullanıcı/Dükkan seçimi
+    typeBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            typeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (btn.dataset.type === 'shop') {
+                shopOnlyFields.forEach(el => el.style.display = 'flex');
+            } else {
+                shopOnlyFields.forEach(el => el.style.display = 'none');
+            }
+        });
+    });
 
-function toggleChat() {
-    console.log('toggleChat çağrıldı');
-    const chatbotWindow = document.querySelector('.chatbot-window');
-    
-    if (chatbotWindow) {
-        isChatOpen = !isChatOpen;
-        chatbotWindow.style.display = isChatOpen ? 'block' : 'none';
-        console.log('Chatbot durumu:', isChatOpen ? 'açık' : 'kapalı');
-        
-        if (isChatOpen) {
-            showScenario('start');
-        }
-    } else {
-        console.error('Chatbot penceresi bulunamadı!');
-    }
-}
-
-function showScenario(scenarioName, data = null) {
-    const scenario = scenarios[scenarioName];
-    if (!scenario) return;
-
-    currentScenario = scenarioName;
-    
-    // Mesajı göster
-    const message = typeof scenario.message === 'function' ? scenario.message(data) : scenario.message;
-    addMessage(message, 'bot');
-
-    // Input alanı varsa göster
-    if (scenario.input) {
-        if (scenario.type === 'date') {
-            showDatePicker(scenario);
-        } else if (scenario.type === 'time') {
-            showTimePicker(scenario);
-        } else {
-            showInputFields(scenario.fields);
-        }
-    } else {
-        // Seçenekleri göster
-        if (scenario.options) {
-            const options = typeof scenario.options === 'function' ? scenario.options() : scenario.options;
-            const optionsDiv = document.createElement('div');
-            optionsDiv.className = 'chat-options';
+    // Form submit örneği
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        registerForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            options.forEach(option => {
-                const button = document.createElement('button');
-                button.className = 'option-button';
-                button.textContent = option.text;
-                button.onclick = () => handleOptionClick(option);
-                optionsDiv.appendChild(button);
+            const formData = new FormData(registerForm);
+            const userData = {
+                email: formData.get('email'),
+                password: formData.get('password'),
+                name: formData.get('name'),
+                phone: formData.get('phone'),
+                type: document.querySelector('.register-type-btn.active').dataset.type,
+                address: formData.get('address'),
+                services: Array.from(formData.getAll('services'))
+            };
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Kayıt başarılı! Giriş yapabilirsiniz.');
+                    registerModal.style.display = 'none';
+                    registerForm.reset();
+                    typeBtns[0].classList.add('active');
+                    typeBtns[1].classList.remove('active');
+                    shopOnlyFields.forEach(el => el.style.display = 'none');
+                } else {
+                    alert(data.message || 'Kayıt sırasında bir hata oluştu');
+                }
+            } catch (error) {
+                console.error('Kayıt hatası:', error);
+                alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+            }
+        });
+    }
+
+    // Login form submit örneği
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(loginForm);
+            const loginData = {
+                email: formData.get('email'),
+                password: formData.get('password'),
+                type: document.querySelector('.login-type-btn.active').dataset.type
+            };
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Token'ı localStorage'a kaydet
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('userType', data.userType);
+                    localStorage.setItem('userId', data.userId);
+
+                    // Kullanıcı menüsünü güncelle
+                    updateUserMenu(data.userType, data.name);
+
+                    alert('Giriş başarılı!');
+                    loginModal.style.display = 'none';
+                    loginForm.reset();
+                    loginTypeBtns[0].classList.add('active');
+                    loginTypeBtns[1].classList.remove('active');
+                } else {
+                    alert(data.message || 'Giriş sırasında bir hata oluştu');
+                }
+            } catch (error) {
+                console.error('Giriş hatası:', error);
+                alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+            }
+        });
+    }
+
+    // Randevu butonu
+    const ctaButton = document.querySelector('.cta-button');
+    if (ctaButton) {
+        ctaButton.addEventListener('click', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                // Kullanıcı giriş yapmışsa randevu modalını aç
+                alert('Randevu sistemi yakında aktif olacak!');
+            } else {
+                // Kullanıcı giriş yapmamışsa giriş modalını aç
+                loginModal.style.display = 'block';
+            }
+        });
+    }
+
+    // Socket.IO bağlantısı
+    const socket = io();
+
+    // Mesajlaşma sistemi
+    let currentChat = null;
+    const messageContainer = document.getElementById('messageContainer');
+    const messageInput = document.getElementById('messageInput');
+    const sendMessageBtn = document.getElementById('sendMessageBtn');
+
+    // Mesajları yükle
+    async function loadMessages(recipientId) {
+        try {
+            const response = await fetch(`/api/messages/${recipientId}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            const messages = await response.json();
+            
+            if (messageContainer) {
+                messageContainer.innerHTML = '';
+                messages.forEach(message => {
+                    appendMessage(message);
+                });
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            }
+        } catch (error) {
+            console.error('Mesajlar yüklenirken hata:', error);
+        }
+    }
+
+    // Mesaj göster
+    function appendMessage(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${message.sender === localStorage.getItem('userId') ? 'sent' : 'received'}`;
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                <p>${message.content}</p>
+                <small>${new Date(message.timestamp).toLocaleTimeString()}</small>
+            </div>
+        `;
+        messageContainer.appendChild(messageDiv);
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+
+    // Mesaj gönder
+    if (sendMessageBtn && messageInput) {
+        sendMessageBtn.addEventListener('click', async function() {
+            const content = messageInput.value.trim();
+            if (!content || !currentChat) return;
+
+            try {
+                const response = await fetch('/api/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        recipientId: currentChat,
+                        content: content
+                    })
+                });
+
+                if (response.ok) {
+                    messageInput.value = '';
+                    const message = await response.json();
+                    appendMessage(message);
+                    socket.emit('private message', {
+                        recipientId: currentChat,
+                        message: message
+                    });
+                }
+            } catch (error) {
+                console.error('Mesaj gönderilirken hata:', error);
+                alert('Mesaj gönderilemedi');
+            }
+        });
+    }
+
+    // Socket.IO olayları
+    socket.on('connect', () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            socket.emit('authenticate', localStorage.getItem('userId'));
+        }
+    });
+
+    socket.on('new message', (message) => {
+        if (message.sender === currentChat) {
+            appendMessage(message);
+        }
+    });
+
+    socket.on('user typing', (data) => {
+        if (data.userId === currentChat) {
+            // Yazıyor... göstergesi
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.style.display = data.isTyping ? 'block' : 'none';
+            }
+        }
+    });
+
+    // Yazma durumu
+    if (messageInput) {
+        let typingTimeout;
+        messageInput.addEventListener('input', () => {
+            if (!currentChat) return;
+
+            socket.emit('typing', {
+                recipientId: currentChat,
+                isTyping: true
             });
 
-            const messagesDiv = document.querySelector('.chat-messages');
-            messagesDiv.appendChild(optionsDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                socket.emit('typing', {
+                    recipientId: currentChat,
+                    isTyping: false
+                });
+            }, 1000);
+        });
+    }
+
+    // Mesajlarım menüsü
+    const openMessages = document.getElementById('openMessages');
+    if (openMessages) {
+        openMessages.addEventListener('click', async function(e) {
+            e.preventDefault();
+            try {
+                const response = await fetch('/api/messages/conversations', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const conversations = await response.json();
+                
+                // Mesajlaşma modalını göster
+                const messagesModal = document.getElementById('messagesModal');
+                if (messagesModal) {
+                    const conversationsList = messagesModal.querySelector('.conversations-list');
+                    conversationsList.innerHTML = conversations.map(conv => `
+                        <div class="conversation-item" data-id="${conv._id}">
+                            <img src="${conv.avatar || 'default-avatar.png'}" alt="${conv.name}">
+                            <div class="conversation-info">
+                                <h4>${conv.name}</h4>
+                                <p>${conv.lastMessage || 'Henüz mesaj yok'}</p>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    // Konuşma seçme
+                    conversationsList.querySelectorAll('.conversation-item').forEach(item => {
+                        item.addEventListener('click', function() {
+                            currentChat = this.dataset.id;
+                            loadMessages(currentChat);
+                        });
+                    });
+
+                    messagesModal.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Konuşmalar yüklenirken hata:', error);
+                alert('Konuşmalar yüklenemedi');
+            }
+        });
+    }
+
+    // LEAFLET HARİTA ENTEGRASYONU
+    window.onload = async function() {
+        if (document.getElementById('leafletMap')) {
+            // Haritayı başlat (örnek: İstanbul merkezli)
+            const map = L.map('leafletMap').setView([41.0082, 28.9784], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            }).addTo(map);
+            const markers = L.markerClusterGroup();
+            map.addLayer(markers);
+
+            try {
+                // Dükkanları API'den çek
+                const response = await fetch('/api/craftsmen');
+                const shops = await response.json();
+
+                const iconTypes = {
+                    genel: L.icon({iconUrl: 'https://cdn-icons-png.flaticon.com/512/484/484167.png', iconSize: [32, 32]}),
+                    lastik: L.icon({iconUrl: 'https://cdn-icons-png.flaticon.com/512/3659/3659898.png', iconSize: [32, 32]}),
+                    kaporta: L.icon({iconUrl: 'https://cdn-icons-png.flaticon.com/512/2936/2936886.png', iconSize: [32, 32]}),
+                    elektrik: L.icon({iconUrl: 'https://cdn-icons-png.flaticon.com/512/3659/3659899.png', iconSize: [32, 32]})
+                };
+
+                shops.forEach(shop => {
+                    const marker = L.marker([shop.location.coordinates[1], shop.location.coordinates[0]], {
+                        icon: iconTypes[shop.type] || iconTypes.genel
+                    }).bindPopup(`
+                        <b>${shop.name}</b><br>
+                        Tür: ${shop.type}<br>
+                        Tel: ${shop.phone}<br>
+                        <button onclick=\"window.navigateToShop('${shop._id}')\">Yol Tarifi Al</button>
+                    `);
+                    markers.addLayer(marker);
+                });
+
+                // Yol tarifi fonksiyonu (window scope)
+                window.navigateToShop = async function(shopId) {
+                    try {
+                        const shopResponse = await fetch(`/api/craftsmen/${shopId}`);
+                        const shop = await shopResponse.json();
+
+                        if(shop && navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(userPos => {
+                                const userLatLng = [userPos.coords.latitude, userPos.coords.longitude];
+                                const shopLatLng = [shop.location.coordinates[1], shop.location.coordinates[0]];
+                                L.polyline([userLatLng, shopLatLng], {color: 'red'}).addTo(map);
+                                map.fitBounds([userLatLng, shopLatLng], {padding: [40, 40]});
+                            });
+                        } else {
+                            alert("Konum bilgisi alınamadı veya dükkan bulunamadı");
+                        }
+                    } catch (error) {
+                        console.error('Dükkan bilgisi alınamadı:', error);
+                        alert('Dükkan bilgisi alınamadı');
+                    }
+                }
+            } catch (error) {
+                console.error('Dükkanlar yüklenirken hata:', error);
+                alert('Dükkanlar yüklenirken bir hata oluştu');
+            }
         }
     }
-}
 
-function showInputFields(fields) {
-    const inputDiv = document.createElement('div');
-    inputDiv.className = 'input-fields';
-    
-    fields.forEach(field => {
-        const label = document.createElement('label');
-        label.textContent = field.label;
-        
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = field.name;
-        input.placeholder = field.label;
-        
-        inputDiv.appendChild(label);
-        inputDiv.appendChild(input);
-    });
+    // Kullanıcı menüsünü güncelleme fonksiyonu
+    function updateUserMenu(userType, userName) {
+        const userMenu = document.querySelector('.user-menu');
+        if (userMenu) {
+            const userDropdown = userMenu.querySelector('.user-dropdown');
+            userDropdown.innerHTML = `
+                <span class="user-name">${userName}</span>
+                <a href="#" id="openAccount">Hesabım</a>
+                <a href="#" id="openMessages">Mesajlarım</a>
+                ${userType === 'shop' ? '<a href="#" id="openAppointments">Randevularım</a>' : ''}
+                <a href="#" id="logout">Çıkış Yap</a>
+            `;
 
-    const submitButton = document.createElement('button');
-    submitButton.textContent = 'Gönder';
-    submitButton.onclick = () => handleInputSubmit(fields);
-    inputDiv.appendChild(submitButton);
-
-    const messagesDiv = document.querySelector('.chat-messages');
-    messagesDiv.appendChild(inputDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-
-function handleInputSubmit(fields) {
-    const inputs = document.querySelectorAll('.input-fields input');
-    const values = {};
-    
-    inputs.forEach(input => {
-        values[input.name] = input.value;
-    });
-
-    // Kullanıcının girdiği bilgileri göster
-    let message = 'Araç Bilgileri:\n';
-    fields.forEach(field => {
-        message += `${field.label}: ${values[field.name]}\n`;
-    });
-    addMessage(message, 'user');
-
-    // Input alanlarını temizle
-    const inputDiv = document.querySelector('.input-fields');
-    if (inputDiv) {
-        inputDiv.remove();
+            // Çıkış yapma işlemi
+            const logoutBtn = document.getElementById('logout');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userType');
+                    localStorage.removeItem('userId');
+                    window.location.reload();
+                });
+            }
+        }
     }
 
-    // Bir sonraki senaryoya geç
-    const scenario = scenarios[currentScenario];
-    if (scenario.next) {
-        showScenario(scenario.next, values);
+    // Sayfa yüklendiğinde token kontrolü
+    async function checkAuth() {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const response = await fetch('/api/auth/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateUserMenu(data.userType, data.name);
+                } else {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userType');
+                    localStorage.removeItem('userId');
+                }
+            } catch (error) {
+                console.error('Token doğrulama hatası:', error);
+            }
+        }
     }
-}
 
-function showDatePicker(scenario) {
-    const inputDiv = document.createElement('div');
-    inputDiv.className = 'input-fields';
-    
-    const input = document.createElement('input');
-    input.type = 'date';
-    input.name = 'date';
-    input.min = new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0];
-    
-    const submitButton = document.createElement('button');
-    submitButton.textContent = 'Seç';
-    submitButton.onclick = () => handleDateSelect(input.value, scenario);
-    
-    inputDiv.appendChild(input);
-    inputDiv.appendChild(submitButton);
-
-    const messagesDiv = document.querySelector('.chat-messages');
-    messagesDiv.appendChild(inputDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-
-function showTimePicker(scenario) {
-    const inputDiv = document.createElement('div');
-    inputDiv.className = 'time-slots';
-    
-    availableHours.forEach(hour => {
-        const button = document.createElement('button');
-        button.className = 'time-slot';
-        button.textContent = hour;
-        button.onclick = () => handleTimeSelect(hour, scenario);
-        inputDiv.appendChild(button);
-    });
-
-    const messagesDiv = document.querySelector('.chat-messages');
-    messagesDiv.appendChild(inputDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-
-function handleDateSelect(date, scenario) {
-    selectedDate = date;
-    const inputDiv = document.querySelector('.input-fields');
-    if (inputDiv) {
-        inputDiv.remove();
-    }
-    if (scenario.next) {
-        showScenario(scenario.next);
-    }
-}
-
-function handleTimeSelect(time, scenario) {
-    selectedTime = time;
-    const timeSlots = document.querySelector('.time-slots');
-    if (timeSlots) {
-        timeSlots.remove();
-    }
-    if (scenario.next) {
-        showScenario(scenario.next);
-    }
-}
-
-function handleOptionClick(option) {
-    // Seçilen seçeneği kullanıcı mesajı olarak göster
-    addMessage(option.text, 'user');
-    
-    // Hizmet seçimi
-    if (option.service) {
-        selectedService = option.service;
-    }
-    // Dükkan seçimi
-    if (option.shop) {
-        selectedShop = option.shop;
-    }
-    
-    // Bir sonraki senaryoya geç
-    if (option.next) {
-        showScenario(option.next);
-    }
-}
-
-function sendMessage() {
-    const input = document.querySelector('.chat-input input');
-    const message = input.value.trim();
-    
-    if (message) {
-        addMessage(message, 'user');
-        input.value = '';
-        
-        // Kullanıcı mesajına göre yanıt ver
-        setTimeout(() => {
-            const response = generateResponse(message);
-            addMessage(response, 'bot');
-        }, 1000);
-    }
-}
-
-function addMessage(text, sender) {
-    const messagesDiv = document.querySelector('.chat-messages');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender}`;
-    messageDiv.textContent = text;
-    messagesDiv.appendChild(messageDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-
-function generateResponse(message) {
-    const lowerMessage = message.toLowerCase();
-    
-    if (lowerMessage.includes('merhaba') || lowerMessage.includes('selam')) {
-        return 'Merhaba! Size nasıl yardımcı olabilirim?';
-    } else if (lowerMessage.includes('teşekkür')) {
-        return 'Rica ederim! Başka bir sorunuz var mı?';
-    } else {
-        return 'Üzgünüm, bu konuda size yardımcı olamıyorum. Lütfen menüden bir seçenek seçin.';
-    }
-} 
+    // Sayfa yüklendiğinde auth kontrolü yap
+    checkAuth();
+});
