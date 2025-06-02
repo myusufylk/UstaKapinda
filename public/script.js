@@ -258,174 +258,60 @@ window.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Socket.IO bağlantısı
-    const socket = io();
+    // Kullanıcı menüsünü güncelleme fonksiyonu
+    function updateUserMenu(userType, userName) {
+        const userMenu = document.querySelector('.user-menu');
+        if (userMenu) {
+            const userDropdown = userMenu.querySelector('.user-dropdown');
+            userDropdown.innerHTML = `
+                <span class="user-name">${userName}</span>
+                <a href="#" id="openAccount">Hesabım</a>
+                <a href="#" id="openMessages">Mesajlarım</a>
+                ${userType === 'shop' ? '<a href="#" id="openAppointments">Randevularım</a>' : ''}
+                <a href="#" id="logout">Çıkış Yap</a>
+            `;
 
-    // Mesajlaşma sistemi
-    let currentChat = null;
-    const messageContainer = document.getElementById('messageContainer');
-    const messageInput = document.getElementById('messageInput');
-    const sendMessageBtn = document.getElementById('sendMessageBtn');
-
-    // Mesajları yükle
-    async function loadMessages(recipientId) {
-        try {
-            const response = await fetch(`/api/messages/${recipientId}`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            const messages = await response.json();
-            
-            if (messageContainer) {
-                messageContainer.innerHTML = '';
-                messages.forEach(message => {
-                    appendMessage(message);
+            // Çıkış yapma işlemi
+            const logoutBtn = document.getElementById('logout');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userType');
+                    localStorage.removeItem('userId');
+                    window.location.reload();
                 });
-                messageContainer.scrollTop = messageContainer.scrollHeight;
             }
-        } catch (error) {
-            console.error('Mesajlar yüklenirken hata:', error);
         }
     }
 
-    // Mesaj göster
-    function appendMessage(message) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${message.sender === localStorage.getItem('userId') ? 'sent' : 'received'}`;
-        messageDiv.innerHTML = `
-            <div class="message-content">
-                <p>${message.content}</p>
-                <small>${new Date(message.timestamp).toLocaleTimeString()}</small>
-            </div>
-        `;
-        messageContainer.appendChild(messageDiv);
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-    }
-
-    // Mesaj gönder
-    if (sendMessageBtn && messageInput) {
-        sendMessageBtn.addEventListener('click', async function() {
-            const content = messageInput.value.trim();
-            if (!content || !currentChat) return;
-
-            try {
-                const response = await fetch('/api/messages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
-                    body: JSON.stringify({
-                        recipientId: currentChat,
-                        content: content
-                    })
-                });
-
-                if (response.ok) {
-                    messageInput.value = '';
-                    const message = await response.json();
-                    appendMessage(message);
-                    socket.emit('private message', {
-                        recipientId: currentChat,
-                        message: message
-                    });
-                }
-            } catch (error) {
-                console.error('Mesaj gönderilirken hata:', error);
-                alert('Mesaj gönderilemedi');
-            }
-        });
-    }
-
-    // Socket.IO olayları
-    socket.on('connect', () => {
+    // Sayfa yüklendiğinde token kontrolü
+    async function checkAuth() {
         const token = localStorage.getItem('token');
         if (token) {
-            socket.emit('authenticate', localStorage.getItem('userId'));
-        }
-    });
-
-    socket.on('new message', (message) => {
-        if (message.sender === currentChat) {
-            appendMessage(message);
-        }
-    });
-
-    socket.on('user typing', (data) => {
-        if (data.userId === currentChat) {
-            // Yazıyor... göstergesi
-            const typingIndicator = document.getElementById('typingIndicator');
-            if (typingIndicator) {
-                typingIndicator.style.display = data.isTyping ? 'block' : 'none';
-            }
-        }
-    });
-
-    // Yazma durumu
-    if (messageInput) {
-        let typingTimeout;
-        messageInput.addEventListener('input', () => {
-            if (!currentChat) return;
-
-            socket.emit('typing', {
-                recipientId: currentChat,
-                isTyping: true
-            });
-
-            clearTimeout(typingTimeout);
-            typingTimeout = setTimeout(() => {
-                socket.emit('typing', {
-                    recipientId: currentChat,
-                    isTyping: false
-                });
-            }, 1000);
-        });
-    }
-
-    // Mesajlarım menüsü
-    const openMessages = document.getElementById('openMessages');
-    if (openMessages) {
-        openMessages.addEventListener('click', async function(e) {
-            e.preventDefault();
             try {
-                const response = await fetch('/api/messages/conversations', {
+                const response = await fetch('/api/auth/verify', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${token}`
                     }
                 });
-                const conversations = await response.json();
                 
-                // Mesajlaşma modalını göster
-                const messagesModal = document.getElementById('messagesModal');
-                if (messagesModal) {
-                    const conversationsList = messagesModal.querySelector('.conversations-list');
-                    conversationsList.innerHTML = conversations.map(conv => `
-                        <div class="conversation-item" data-id="${conv._id}">
-                            <img src="${conv.avatar || 'default-avatar.png'}" alt="${conv.name}">
-                            <div class="conversation-info">
-                                <h4>${conv.name}</h4>
-                                <p>${conv.lastMessage || 'Henüz mesaj yok'}</p>
-                            </div>
-                        </div>
-                    `).join('');
-
-                    // Konuşma seçme
-                    conversationsList.querySelectorAll('.conversation-item').forEach(item => {
-                        item.addEventListener('click', function() {
-                            currentChat = this.dataset.id;
-                            loadMessages(currentChat);
-                        });
-                    });
-
-                    messagesModal.style.display = 'block';
+                if (response.ok) {
+                    const data = await response.json();
+                    updateUserMenu(data.userType, data.name);
+                } else {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userType');
+                    localStorage.removeItem('userId');
                 }
             } catch (error) {
-                console.error('Konuşmalar yüklenirken hata:', error);
-                alert('Konuşmalar yüklenemedi');
+                console.error('Token doğrulama hatası:', error);
             }
-        });
+        }
     }
+
+    // Sayfa yüklendiğinde auth kontrolü yap
+    checkAuth();
 
     // LEAFLET HARİTA ENTEGRASYONU
     window.onload = async function() {
@@ -490,59 +376,4 @@ window.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-
-    // Kullanıcı menüsünü güncelleme fonksiyonu
-    function updateUserMenu(userType, userName) {
-        const userMenu = document.querySelector('.user-menu');
-        if (userMenu) {
-            const userDropdown = userMenu.querySelector('.user-dropdown');
-            userDropdown.innerHTML = `
-                <span class="user-name">${userName}</span>
-                <a href="#" id="openAccount">Hesabım</a>
-                <a href="#" id="openMessages">Mesajlarım</a>
-                ${userType === 'shop' ? '<a href="#" id="openAppointments">Randevularım</a>' : ''}
-                <a href="#" id="logout">Çıkış Yap</a>
-            `;
-
-            // Çıkış yapma işlemi
-            const logoutBtn = document.getElementById('logout');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('userType');
-                    localStorage.removeItem('userId');
-                    window.location.reload();
-                });
-            }
-        }
-    }
-
-    // Sayfa yüklendiğinde token kontrolü
-    async function checkAuth() {
-        const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const response = await fetch('/api/auth/verify', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    updateUserMenu(data.userType, data.name);
-                } else {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('userType');
-                    localStorage.removeItem('userId');
-                }
-            } catch (error) {
-                console.error('Token doğrulama hatası:', error);
-            }
-        }
-    }
-
-    // Sayfa yüklendiğinde auth kontrolü yap
-    checkAuth();
 });

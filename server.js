@@ -50,51 +50,7 @@ mongoose.connect('mongodb://localhost:27017/ustakapinda', {
 .catch(err => console.error('MongoDB connection error:', err));
 
 // WebSocket connection handling
-const connectedUsers = new Map();
-
-io.on('connection', (socket) => {
-    console.log('New client connected');
-
-    // Handle user authentication
-    socket.on('authenticate', (userId) => {
-        connectedUsers.set(userId, socket.id);
-        console.log(`User ${userId} authenticated`);
-    });
-
-    // Handle private messages
-    socket.on('private message', async (data) => {
-        const { recipientId, message } = data;
-        const recipientSocketId = connectedUsers.get(recipientId);
-
-        if (recipientSocketId) {
-            io.to(recipientSocketId).emit('new message', message);
-        }
-    });
-
-    // Handle typing status
-    socket.on('typing', (data) => {
-        const { recipientId, isTyping } = data;
-        const recipientSocketId = connectedUsers.get(recipientId);
-
-        if (recipientSocketId) {
-            io.to(recipientSocketId).emit('user typing', {
-                userId: socket.id,
-                isTyping
-            });
-        }
-    });
-
-    // Handle disconnection
-    socket.on('disconnect', () => {
-        for (const [userId, socketId] of connectedUsers.entries()) {
-            if (socketId === socket.id) {
-                connectedUsers.delete(userId);
-                break;
-            }
-        }
-        console.log('Client disconnected');
-    });
-});
+// Mesajlaşma ve Socket.IO ile ilgili kodlar kaldırıldı
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -102,7 +58,6 @@ const userRoutes = require('./routes/users');
 const craftsmanRoutes = require('./routes/craftsmen');
 const jobRoutes = require('./routes/jobs');
 const categoryRoutes = require('./routes/categories');
-const messageRoutes = require('./routes/messages');
 const notificationRoutes = require('./routes/notifications');
 const paymentRoutes = require('./routes/payments');
 const reviewRoutes = require('./routes/reviews');
@@ -113,7 +68,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/craftsmen', craftsmanRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/categories', categoryRoutes);
-app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/reviews', reviewRoutes);

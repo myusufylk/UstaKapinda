@@ -258,62 +258,18 @@
         </div>
     </div>
 
-    <!-- Mesajlaşma Modalı -->
-    <div id="messagesModal" class="modal">
-        <div class="modal-content messages-modal">
-            <div class="modal-header">
-                <h2>Mesajlarım</h2>
-                <span class="close" id="closeMessagesModal">&times;</span>
-            </div>
-            <div class="messages-container">
-                <div class="conversations-list">
-                    <!-- Konuşmalar buraya dinamik olarak eklenecek -->
-                </div>
-                <div class="chat-container">
-                    <div id="messageContainer" class="message-container">
-                        <!-- Mesajlar buraya dinamik olarak eklenecek -->
-                    </div>
-                    <div id="typingIndicator" class="typing-indicator" style="display: none;">
-                        <span>Yazıyor...</span>
-                    </div>
-                    <div class="message-input-container">
-                        <input type="text" id="messageInput" placeholder="Mesajınızı yazın...">
-                        <button id="sendMessageBtn">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Canlı Destek Chat Widget -->
-    <div class="chatbot-container">
-        <button class="chatbot-emoji" type="button">
+    <!-- Canlı Destek Emoji Butonu -->
+    <div class="livesupport-emoji-container">
+        <button class="livesupport-emoji" type="button">
             <span>💬</span>
         </button>
-        <div class="chatbot-window">
-            <div class="chatbot-header">
-                <span>Canlı Destek</span>
-                <button class="close-btn" type="button">×</button>
-            </div>
-            <div class="chatbot-body">
-                <div class="chat-messages">
-                    <div class="message bot">
-                        Merhaba! Size nasıl yardımcı olabilirim?
-                    </div>
-                </div>
-                <div class="chat-input">
-                    <input type="text" placeholder="Mesajınızı yazın...">
-                    <button type="button" id="sendChatMessage">Gönder</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script src="/script.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/components/Chatbot.js"></script>
+    <script src="/js/components/LiveSupport.js"></script>
 </body>
 </html>
