@@ -1,385 +1,1322 @@
-/* Genel Stiller */
-:root {
-    --primary-color: #2563eb;
-    --secondary-color: #1e40af;
-    --text-color: #1f2937;
-    --light-bg: #f3f4f6;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    color: var(--text-color);
-    padding-top: 76px;
-    margin: 20px;
+    min-height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    background: #0a0a0a;
+    color: #fff;
 }
 
-/* Navbar Stilleri */
-.navbar {
-    transition: all 0.3s ease;
+.background-images {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -2;
+    overflow: hidden;
 }
 
-.navbar-brand img {
-    height: 40px;
+.bg-image {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('/arka%20plan/860.jpeg');
+    background-size: cover;
+    background-position: center;
+    opacity: 1;
+    filter: none;
+    z-index: -2;
 }
 
-.nav-link {
-    font-weight: 500;
-    color: var(--text-color) !important;
-    transition: color 0.3s ease;
+.bg-overlay {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.15) 100%);
+    z-index: -1;
 }
 
-.nav-link:hover {
-    color: var(--primary-color) !important;
+.bg-mechanic {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 500px;
+    height: 400px;
+    background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: bottom right;
+    opacity: 0.92;
+    filter: brightness(1.08) contrast(1.1) saturate(1.1);
+    z-index: 0;
+    pointer-events: none;
 }
 
-/* Hero Section Stilleri */
-.hero-section {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    padding: 100px 0;
-}
-
-.hero-section h1 {
-    color: var(--text-color);
-    margin-bottom: 1.5rem;
-}
-
-/* Kart Stilleri */
-.card {
-    transition: transform 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
-
-.card-img-top {
-    height: 200px;
-    object-fit: cover;
-}
-
-/* Step Icon Stilleri */
-.step-icon {
-    width: 80px;
-    height: 80px;
+.container {
+    max-width: 1400px;
     margin: 0 auto;
+    padding: 40px 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.logo {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--light-bg);
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.logo i {
+    font-size: 2.5rem;
+    color: #3498db;
+}
+
+.header h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(45deg, #3498db, #2ecc71);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 32px rgba(52, 152, 219, 0.3);
+}
+
+.tagline {
+    font-size: 1.2rem;
+    color: #888;
+    letter-spacing: 0.1em;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+}
+
+.car-widget {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 40px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.car-image {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+}
+
+.car-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.car-image:hover img {
+    transform: scale(1.05);
+}
+
+.car-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+}
+
+.car-info h2 {
+    font-size: 2.5rem;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.car-info p {
+    font-size: 1.1rem;
+    color: #888;
+    line-height: 1.6;
+}
+
+.features {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.feature i {
+    color: #2ecc71;
+    font-size: 1.2rem;
+}
+
+.feature span {
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.service-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card i {
+    font-size: 2.5rem;
+    color: #3498db;
+    margin-bottom: 20px;
+}
+
+.card h3 {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.card p {
+    color: #888;
+    line-height: 1.6;
+}
+
+.cta-section {
+    text-align: center;
+    padding: 60px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    margin-top: 40px;
+}
+
+.cta-section h2 {
+    font-size: 2.5rem;
+    color: #fff;
+    margin-bottom: 15px;
+}
+
+.cta-section p {
+    color: #888;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+}
+
+.cta-button {
+    background: linear-gradient(45deg, #3498db, #2ecc71);
+    border: none;
+    padding: 15px 40px;
+    border-radius: 30px;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cta-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+}
+
+/* Canlı Destek Stilleri */
+.support-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.chat-container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.chat-header {
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.support-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    background: #2ecc71;
     border-radius: 50%;
+}
+
+.chat-messages {
+    height: 400px;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.message {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.message.support {
+    align-items: flex-start;
+}
+
+.message.user {
+    align-items: flex-end;
+}
+
+.message-content {
+    max-width: 70%;
+    padding: 10px 15px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.message.user .message-content {
+    background: #3498db;
+}
+
+.message-time {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 5px;
+}
+
+.chat-input {
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 10px;
+}
+
+.chat-input button {
+    padding: 10px 20px;
+    background: #3498db;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
     transition: all 0.3s ease;
 }
 
-.step-icon:hover {
-    background: var(--primary-color);
-    color: white !important;
+.chat-input button:hover {
+    background: #2980b9;
 }
 
-/* Footer Stilleri */
-footer {
-    background-color: #1f2937;
+.support-info {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
 }
 
-footer a {
-    text-decoration: none;
-    transition: color 0.3s ease;
+.support-info h3 {
+    margin-bottom: 20px;
+    text-align: center;
 }
 
-footer a:hover {
-    color: var(--primary-color) !important;
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
 }
 
-/* Responsive Düzenlemeler */
-@media (max-width: 768px) {
-    .hero-section {
-        padding: 50px 0;
+.info-item i {
+    color: #3498db;
+    font-size: 1.2rem;
+}
+
+/* Hakkımızda Sayfası Stilleri */
+.about-section-main {
+    background: rgba(255,255,255,0.07);
+    padding: 60px 0 40px 0;
+    margin-top: 60px;
+}
+.about-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+}
+.about-container h2 {
+    color: #3498db;
+    font-size: 2.3rem;
+    margin-bottom: 18px;
+    letter-spacing: 0.04em;
+}
+.about-container > p {
+    color: #eee;
+    font-size: 1.1rem;
+    margin-bottom: 36px;
+}
+.about-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    justify-content: center;
+}
+.about-card {
+    background: rgba(255,255,255,0.13);
+    border-radius: 14px;
+    padding: 28px 22px;
+    min-width: 220px;
+    max-width: 300px;
+    flex: 1 1 220px;
+    box-shadow: 0 4px 18px rgba(52,152,219,0.08);
+    color: #fff;
+    text-align: left;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.about-card:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 8px 32px rgba(52,152,219,0.18);
+}
+.about-card h3 {
+    color: #2ecc71;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.about-card p {
+    color: #fff;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+@media (max-width: 900px) {
+    .about-cards {
+        flex-direction: column;
+        gap: 18px;
     }
-    
-    .hero-section img {
-        margin-top: 2rem;
+    .about-card {
+        max-width: 100%;
     }
 }
 
-/* Animasyonlar */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
+/* Emeği Geçenler Bölümü Stilleri */
+.team-section-main {
+    background: rgba(255,255,255,0.04);
+    padding: 40px 0 30px 0;
+}
+.team-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+}
+.team-container h2 {
+    color: #3498db;
+    font-size: 2rem;
+    margin-bottom: 28px;
+    letter-spacing: 0.04em;
+}
+.team-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: center;
+}
+.team-card {
+    background: rgba(255,255,255,0.13);
+    border-radius: 14px;
+    padding: 22px 18px;
+    min-width: 180px;
+    max-width: 220px;
+    flex: 1 1 180px;
+    box-shadow: 0 4px 18px rgba(52,152,219,0.08);
+    color: #fff;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.team-card:hover {
+    transform: translateY(-4px) scale(1.04);
+    box-shadow: 0 8px 32px rgba(52,152,219,0.18);
+}
+.team-icon {
+    font-size: 2.2rem;
+    color: #2ecc71;
+    margin-bottom: 10px;
+}
+.team-info h4 {
+    color: #3498db;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+}
+.team-info p {
+    color: #fff;
+    font-size: 0.98rem;
+    margin: 0;
+}
+@media (max-width: 900px) {
+    .team-cards {
+        flex-direction: column;
+        gap: 14px;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    .team-card {
+        max-width: 100%;
     }
 }
 
-.hero-section, .card, .step-icon {
-    animation: fadeIn 1s ease-out;
+/* SOSYAL MEDYA İKONLARI */
+.social-bar {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 30px 0 0 0;
+    z-index: 2;
+    position: relative;
 }
 
-/* Chatbot Stilleri */
+.social-bar a {
+    color: #fff;
+    font-size: 1.7rem;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.social-bar a:hover {
+    color: #3498db;
+    transform: scale(1.2);
+}
+
+/* HAKKIMIZDA ve EKİBİMİZ DİKEY YAZI */
+.vertical-label {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%) rotate(-90deg);
+    color: #fff;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    z-index: 10;
+    opacity: 0.7;
+    background: rgba(0,0,0,0.3);
+    padding: 8px 18px;
+    border-radius: 0 0 12px 12px;
+}
+
+.vertical-label.right {
+    left: unset;
+    right: 0;
+    border-radius: 0 0 12px 12px;
+}
+
+/* RESPONSIVE TASARIM */
+@media (max-width: 900px) {
+    .container {
+        padding: 10px;
+    }
+    .main-content {
+        gap: 30px;
+    }
+    .car-widget {
+        grid-template-columns: 1fr;
+        padding: 18px;
+    }
+    .service-cards {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+    .about-section-main, .team-section-main, .map-section {
+        padding: 24px 0 18px 0;
+    }
+    .header h1 {
+        font-size: 2.5rem;
+    }
+    .about-container h2, .team-container h2, .map-container h2 {
+        font-size: 1.2rem;
+    }
+    .about-card, .team-card {
+        padding: 12px 6px;
+    }
+    .cta-section {
+        padding: 18px 4px;
+    }
+    .footer-content {
+        font-size: 0.9rem;
+    }
+    .user-menu-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+    .header h1 {
+        font-size: 1.5rem;
+    }
+    .logo i {
+        font-size: 1.3rem;
+    }
+    .about-container h2, .team-container h2, .map-container h2 {
+        font-size: 1.2rem;
+    }
+    .about-card, .team-card {
+        padding: 12px 6px;
+    }
+    .cta-section {
+        padding: 18px 4px;
+    }
+    .footer-content {
+        font-size: 0.9rem;
+    }
+    .user-menu-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 1.1rem;
+    }
+}
+
+/* Chatbot Widget Stilleri */
 .chatbot-container {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;
+    bottom: 24px;
+    right: 24px;
+    z-index: 10000;
 }
 
 .chatbot-emoji {
-    width: 60px;
-    height: 60px;
-    background: #2563eb;
+    width: 54px;
+    height: 54px;
+    background: linear-gradient(45deg, #3498db, #2ecc71);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    transition: transform 0.3s ease;
-    z-index: 1001;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.18);
+    transition: transform 0.3s;
     border: none;
     padding: 0;
+    font-size: 2rem;
 }
 
 .chatbot-emoji:hover {
-    transform: scale(1.1);
-}
-
-.chatbot-emoji span {
-    font-size: 30px;
+    transform: scale(1.08);
 }
 
 .chatbot-window {
     position: absolute;
     bottom: 70px;
     right: 0;
-    width: 350px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 340px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.18);
     display: none;
     z-index: 1000;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    animation: fadeIn 0.3s;
 }
 
 .chatbot-header {
-    background: #2563eb;
+    background: linear-gradient(45deg, #3498db, #2ecc71);
     color: white;
-    padding: 15px;
-    border-radius: 10px 10px 0 0;
+    padding: 14px 20px;
+    border-radius: 15px 15px 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
+.chatbot-header span {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
 .close-btn {
-    font-size: 24px;
+    font-size: 22px;
     cursor: pointer;
-    line-height: 1;
     background: none;
     border: none;
     color: white;
     padding: 0;
+    transition: transform 0.2s;
+}
+
+.close-btn:hover {
+    transform: scale(1.1);
 }
 
 .chatbot-body {
-    height: 400px;
+    height: 320px;
     display: flex;
     flex-direction: column;
+    background: #f7fafd;
 }
 
 .chat-messages {
     flex-grow: 1;
-    padding: 15px;
+    padding: 18px;
     overflow-y: auto;
 }
 
 .message {
-    margin-bottom: 10px;
-    padding: 10px;
+    margin-bottom: 12px;
+    padding: 10px 14px;
     border-radius: 10px;
     max-width: 80%;
+    line-height: 1.5;
+    font-size: 0.98rem;
 }
 
 .message.user {
-    background: #e3f2fd;
+    background: linear-gradient(45deg, #3498db, #2ecc71);
+    color: white;
     margin-left: auto;
 }
 
 .message.bot {
-    background: #f3f4f6;
+    background: #e3f0fa;
+    color: #333;
     margin-right: auto;
-    white-space: pre-line;
-    line-height: 1.6;
-}
-
-.message.bot emoji {
-    font-size: 1.2em;
-    margin-right: 5px;
 }
 
 .chat-input {
-    padding: 15px;
-    border-top: 1px solid #eee;
+    padding: 14px;
+    border-top: 1px solid #e0e0e0;
     display: flex;
     gap: 10px;
+    background: #fff;
+    border-radius: 0 0 15px 15px;
 }
 
 .chat-input input {
     flex-grow: 1;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
     outline: none;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.chat-input input:focus {
+    border-color: #3498db;
 }
 
 .chat-input button {
-    padding: 8px 15px;
-    background: #2563eb;
+    padding: 10px 18px;
+    background: linear-gradient(45deg, #3498db, #2ecc71);
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .chat-input button:hover {
-    background: #1e40af;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.13);
 }
 
-/* Chat Seçenekleri */
-.chat-options {
+@media (max-width: 600px) {
+    .chatbot-window {
+        width: 98vw;
+        right: 0;
+        left: 0;
+        margin: 0 auto;
+    }
+    .chatbot-container {
+        right: 10px;
+        bottom: 10px;
+    }
+}
+
+.chatbot-window.active {
+    display: block;
+}
+
+.header-actions {
+    position: fixed;
+    top: 24px;
+    right: 0;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin: 10px 0;
+    gap: 15px;
+    z-index: 20;
+    background: #fff;
+    border-radius: 18px 0 0 18px;
+    box-shadow: 0 2px 16px rgba(52,152,219,0.10);
+    padding: 10px 24px 10px 18px;
+    border: 2px solid #e0e0e0;
+    border-right: none;
+    align-items: center;
 }
 
-.option-button {
-    background: #f3f4f6;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 10px 15px;
-    text-align: left;
+.btn {
+    padding: 8px 22px;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    box-shadow: none;
+    border: none;
+    outline: none;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 14px;
-    color: #1f2937;
+    display: inline-block;
 }
 
-.option-button:hover {
-    background: #e5e7eb;
-    transform: translateX(5px);
+.btn-primary {
+    background: linear-gradient(45deg, #3498db, #2ecc71);
+    color: #fff;
+    border: none;
 }
 
-.option-button:active {
-    transform: translateX(2px);
+.btn-primary:hover {
+    background: linear-gradient(45deg, #217dbb, #27ae60);
+    color: #fff;
 }
 
-/* Input Fields Stilleri */
-.input-fields {
+.btn-outline {
+    background: transparent;
+    color: #3498db;
+    border: 2px solid #3498db;
+}
+
+.btn-outline:hover {
+    background: #3498db;
+    color: #fff;
+}
+
+/* Modal Kayıt Formu */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    background: #fff;
+    margin: 60px auto;
+    padding: 32px 32px 24px 32px;
+    border-radius: 18px;
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(52,152,219,0.18);
+    position: relative;
+    animation: fadeIn 0.3s;
+}
+
+.close-modal {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    font-size: 2rem;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.2s;
+    z-index: 2;
+}
+.close-modal:hover {
+    color: #3498db;
+}
+
+.modal-content h2 {
+    text-align: center;
+    color: #3498db;
+    margin-bottom: 18px;
+}
+
+.register-type {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.register-type-btn {
+    padding: 8px 22px;
+    border-radius: 20px;
+    border: 2px solid #3498db;
+    background: #fff;
+    color: #3498db;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.register-type-btn.active, .register-type-btn:hover {
+    background: #3498db;
+    color: #fff;
+}
+
+#registerForm .form-group {
+    margin-bottom: 15px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin: 10px 0;
-    padding: 15px;
-    background: #f8fafc;
-    border-radius: 8px;
+    align-items: flex-start;
 }
-
-.input-fields label {
-    font-size: 14px;
-    color: #1f2937;
+#registerForm label {
+    margin-bottom: 5px;
+    color: #333;
     font-weight: 500;
 }
-
-.input-fields input {
-    padding: 8px 12px;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    font-size: 14px;
+#registerForm input {
     width: 100%;
-    transition: border-color 0.3s ease;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1.5px solid #d0d0d0;
+    font-size: 1rem;
+    transition: border 0.2s;
 }
-
-.input-fields input:focus {
+#registerForm input:focus {
+    border: 1.5px solid #3498db;
     outline: none;
-    border-color: #2563eb;
 }
 
-.input-fields button {
-    margin-top: 10px;
-    padding: 8px 16px;
-    background: #2563eb;
-    color: white;
+@media (max-width: 600px) {
+    .modal-content {
+        max-width: 98vw;
+        padding: 18px 6vw 18px 6vw;
+    }
+}
+
+.services-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin-top: 6px;
+}
+.services-list label {
+    font-weight: 400;
+    color: #333;
+    background: #f5f7fa;
+    border-radius: 8px;
+    padding: 6px 14px 6px 8px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.services-list label:hover {
+    background: #e3f0fa;
+}
+.services-list input[type="checkbox"] {
+    margin-right: 7px;
+    accent-color: #3498db;
+}
+
+.login-type-btn {
+    padding: 8px 22px;
+    border-radius: 20px;
+    border: 2px solid #3498db;
+    background: #fff;
+    color: #3498db;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.login-type-btn.active, .login-type-btn:hover {
+    background: #3498db;
+    color: #fff;
+}
+
+#loginForm .form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+#loginForm label {
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: 500;
+}
+#loginForm input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1.5px solid #d0d0d0;
+    font-size: 1rem;
+    transition: border 0.2s;
+}
+#loginForm input:focus {
+    border: 1.5px solid #3498db;
+    outline: none;
+}
+
+.user-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.user-menu-btn {
+    background: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: 50%;
+    padding: 4px 6px;
+    font-size: 1.5rem;
+    color: #3498db;
     cursor: pointer;
-    transition: background 0.3s ease;
+    box-shadow: 0 2px 8px rgba(52,152,219,0.08);
+    transition: background 0.2s, color 0.2s;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-
-.input-fields button:hover {
-    background: #1e40af;
+.user-menu-btn:hover {
+    background: #f0f8ff;
+    color: #217dbb;
 }
-
-.input-fields input[type="date"] {
-    padding: 8px 12px;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    font-size: 14px;
-    width: 100%;
-    transition: border-color 0.3s ease;
-    cursor: pointer;
+.user-dropdown {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 120%;
+    left: auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(52,152,219,0.13);
+    min-width: 120px;
+    z-index: 100;
+    flex-direction: column;
+    padding: 8px 0;
+    align-items: flex-start;
 }
-
-.input-fields input[type="date"]:focus {
-    outline: none;
-    border-color: #2563eb;
-}
-
-/* Saat Seçimi Stilleri */
-.time-slots {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin: 10px 0;
-    padding: 15px;
-    background: #f8fafc;
+.user-dropdown a {
+    color: #3498db;
+    text-decoration: none;
+    padding: 10px 18px;
+    display: block;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
     border-radius: 8px;
 }
+.user-dropdown a:hover {
+    background: #f0f8ff;
+    color: #217dbb;
+}
+.user-menu.open .user-dropdown {
+    display: flex;
+}
 
-.time-slot {
-    padding: 8px;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+.map-section {
+    background: rgba(255,255,255,0.06);
+    padding: 40px 0 30px 0;
+}
+.map-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
     text-align: center;
 }
-
-.time-slot:hover {
-    background: #2563eb;
-    color: white;
-    border-color: #2563eb;
-    transform: translateY(-2px);
+.map-container h2 {
+    color: #3498db;
+    font-size: 2rem;
+    margin-bottom: 18px;
+    letter-spacing: 0.04em;
+}
+.map-embed {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(52,152,219,0.10);
+}
+@media (max-width: 900px) {
+    .map-embed {
+        max-width: 100%;
+    }
 }
 
-.time-slot:active {
-    transform: translateY(0);
+#accountModal .modal-content {
+    max-width: 350px;
+    padding: 32px 24px 24px 24px;
+}
+.account-info {
+    margin-bottom: 18px;
+    text-align: left;
+}
+.account-info p {
+    color: #333;
+    font-size: 1rem;
+    margin-bottom: 7px;
+}
+.account-actions {
+    display: flex;
+    justify-content: flex-end;
 }
 
-/* Randevu Onay Mesajı */
-.message.bot {
-    background: #f3f4f6;
-    margin-right: auto;
-    white-space: pre-line;
-    line-height: 1.6;
+.leaflet-map-section {
+    background: rgba(255,255,255,0.06);
+    padding: 40px 0 30px 0;
+}
+.leaflet-map-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+    background: rgba(255,255,255,0.85);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(52,152,219,0.13);
+    border: 2px solid #e0e0e0;
+    margin-bottom: 40px;
+}
+.leaflet-map-container h2 {
+    color: #3498db;
+    font-size: 2rem;
+    margin-bottom: 22px;
+    letter-spacing: 0.04em;
+    padding-top: 18px;
+}
+#leafletMap {
+    width: 100%;
+    height: 350px;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(52,152,219,0.10);
+    margin: 0 auto 18px auto;
+    border: 1.5px solid #b0b0b0;
+}
+@media (max-width: 900px) {
+    #leafletMap {
+        height: 220px;
+    }
+    .leaflet-map-container {
+        padding: 0 2vw;
+    }
+}
+
+/* Mesajlaşma Modalı Stilleri */
+.messages-modal {
+    width: 80%;
+    max-width: 1000px;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.messages-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.conversations-list {
+    width: 300px;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    background: #f8f9fa;
+}
+
+.conversation-item {
+    display: flex;
+    align-items: center;
     padding: 15px;
-    border-radius: 10px;
-    max-width: 90%;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
-.message.bot emoji {
-    font-size: 1.2em;
-    margin-right: 5px;
-} 
+.conversation-item:hover {
+    background-color: #e9ecef;
+}
+
+.conversation-item img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+}
+
+.conversation-info {
+    flex: 1;
+}
+
+.conversation-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.conversation-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+}
+
+.message-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.message {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.message.sent {
+    align-items: flex-end;
+}
+
+.message.received {
+    align-items: flex-start;
+}
+
+.message-content {
+    max-width: 70%;
+    padding: 10px 15px;
+    border-radius: 15px;
+    position: relative;
+}
+
+.message.sent .message-content {
+    background-color: #007bff;
+    color: white;
+    border-bottom-right-radius: 5px;
+}
+
+.message.received .message-content {
+    background-color: #e9ecef;
+    color: #333;
+    border-bottom-left-radius: 5px;
+}
+
+.message-content p {
+    margin: 0 0 5px 0;
+}
+
+.message-content small {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.typing-indicator {
+    padding: 10px 20px;
+    color: #666;
+    font-style: italic;
+}
+
+.message-input-container {
+    display: flex;
+    padding: 15px;
+    border-top: 1px solid #ddd;
+    background: #fff;
+}
+
+.message-input-container input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+.message-input-container button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.message-input-container button:hover {
+    background: #0056b3;
+}
+
+/* Responsive Tasarım */
+@media (max-width: 768px) {
+    .messages-modal {
+        width: 95%;
+        height: 90vh;
+    }
+
+    .conversations-list {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .messages-container {
+        flex-direction: column;
+    }
+
+    .chat-container {
+        height: calc(100% - 200px);
+    }
+}

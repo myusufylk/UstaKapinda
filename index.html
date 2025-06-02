@@ -4,212 +4,316 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UstaKapında - Oto Servis Yönetim Sistemi</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
 </head>
 <body>
     <div class="background-images">
         <div class="bg-image bg-1"></div>
-        <div class="bg-image bg-2"></div>
         <div class="bg-overlay"></div>
     </div>
 
     <div class="container">
         <div class="header">
-            <i class="fas fa-tools"></i>
-            <h1>UstaKapında</h1>
-            <i class="fas fa-car"></i>
+            <div class="header-actions">
+                <div class="user-menu">
+                    <button class="user-menu-btn"><i class="fas fa-user-circle"></i></button>
+                    <div class="user-dropdown">
+                        <a href="#" id="openRegister">Kayıt Ol</a>
+                        <a href="#" id="openLogin">Giriş Yap</a>
+                    </div>
+                </div>
+            </div>
+            <div class="logo">
+                <i class="fas fa-tools"></i>
+                <h1>UstaKapında</h1>
+            </div>
+            <p class="tagline">Aracınız için en iyi servis deneyimi</p>
         </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="user">
-                <i class="fas fa-user"></i>
-                Kullanıcı Kaydı
-            </button>
-            <button class="tab-btn" data-tab="shop">
-                <i class="fas fa-store"></i>
-                Dükkan Kaydı
-            </button>
-            <button class="tab-btn" data-tab="support">
-                <i class="fas fa-headset"></i>
-                Canlı Destek
-            </button>
-            <button class="tab-btn" data-tab="about">
-                <i class="fas fa-info-circle"></i>
-                Hakkımızda
-            </button>
-        </div>
-
-        <div class="tab-content active" id="user-tab">
-            <h2>Kullanıcı Kayıt Formu</h2>
-            <form id="userForm">
-                <div class="form-group">
-                    <i class="fas fa-user"></i>
-                    <input type="text" id="userName" placeholder="Ad Soyad" required>
+        <div class="main-content">
+            <div class="car-widget">
+                <div class="car-image">
+                    <img src="/arka%20plan/860.jpeg" alt="Modern Araba">
                 </div>
-                <div class="form-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" id="userEmail" placeholder="E-posta" required>
-                </div>
-                <div class="form-group">
-                    <i class="fas fa-phone"></i>
-                    <input type="tel" id="userPhone" placeholder="Telefon" required>
-                </div>
-                <div class="form-group">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <textarea id="userAddress" placeholder="Adres" required></textarea>
-                </div>
-                <div class="form-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="userPassword" placeholder="Şifre" required>
-                </div>
-                <button type="submit">
-                    <i class="fas fa-save"></i>
-                    Kaydet
-                </button>
-            </form>
-        </div>
-
-        <div class="tab-content" id="shop-tab">
-            <h2>Dükkan Kayıt Formu</h2>
-            <form id="shopForm">
-                <div class="form-group">
-                    <i class="fas fa-store"></i>
-                    <input type="text" id="shopName" placeholder="Dükkan Adı" required>
-                </div>
-                <div class="form-group">
-                    <i class="fas fa-user-tie"></i>
-                    <input type="text" id="ownerName" placeholder="Dükkan Sahibi" required>
-                </div>
-                <div class="form-group">
-                    <i class="fas fa-phone"></i>
-                    <input type="tel" id="shopPhone" placeholder="Telefon" required>
-                </div>
-                <div class="form-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" id="shopEmail" placeholder="E-posta" required>
-                </div>
-                <div class="form-group">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <textarea id="shopAddress" placeholder="Adres" required></textarea>
-                </div>
-                <div class="form-group">
-                    <i class="fas fa-clock"></i>
-                    <input type="text" id="workingHours" placeholder="Çalışma Saatleri" required>
-                </div>
-                <div class="form-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="shopPassword" placeholder="Şifre" required>
-                </div>
-                <button type="submit">
-                    <i class="fas fa-save"></i>
-                    Kaydet
-                </button>
-            </form>
-        </div>
-
-        <div class="tab-content" id="support-tab">
-            <div class="support-container">
-                <div class="chat-container">
-                    <div class="chat-header">
-                        <h3>Canlı Destek</h3>
-                        <div class="support-status">
-                            <span class="status-dot"></span>
-                            <span class="status-text">Çevrimiçi</span>
+                <div class="car-info">
+                    <h2>Premium Servis</h2>
+                    <p>Aracınız için en iyi bakım ve onarım hizmeti</p>
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Uzman Teknisyenler</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Orijinal Parçalar</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Garantili Hizmet</span>
                         </div>
                     </div>
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="message support">
-                            <div class="message-content">
-                                <p>Merhaba! Size nasıl yardımcı olabilirim?</p>
-                            </div>
-                            <div class="message-time">10:00</div>
-                        </div>
-                    </div>
-                    <div class="chat-input">
-                        <input type="text" id="messageInput" placeholder="Mesajınızı yazın...">
-                        <button id="sendMessage">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
+                </div>
+            </div>
+
+            <div class="service-cards">
+                <div class="card">
+                    <i class="fas fa-car-battery"></i>
+                    <h3>Akü Servisi</h3>
+                    <p>Akü kontrolü ve değişimi</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-oil-can"></i>
+                    <h3>Yağ Değişimi</h3>
+                    <p>Motor yağı ve filtre değişimi</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <h3>Fren Bakımı</h3>
+                    <p>Fren sistemi kontrolü ve bakımı</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-cogs"></i>
+                    <h3>Genel Bakım</h3>
+                    <p>Kapsamlı araç bakımı</p>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <h2>Hemen Randevu Alın</h2>
+                <p>Aracınız için en iyi servis deneyimini yaşayın</p>
+                <button class="cta-button">
+                    <i class="fas fa-calendar-alt"></i>
+                    Randevu Al
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <section class="about-section-main">
+        <div class="about-container">
+            <h2>Hakkımızda</h2>
+            <p>UstaKapında, araç sahipleri ile güvenilir oto servisleri buluşturan modern bir platformdur. Amacımız, aracınız için en iyi hizmeti hızlı, kolay ve şeffaf şekilde sunmak.</p>
+            <div class="about-cards">
+                <div class="about-card">
+                    <h3><i class="fas fa-bullseye"></i> Misyonumuz</h3>
+                    <p>Oto servis sektöründe güven, kalite ve müşteri memnuniyetini en üst seviyeye taşımak.</p>
+                </div>
+                <div class="about-card">
+                    <h3><i class="fas fa-eye"></i> Vizyonumuz</h3>
+                    <p>Türkiye'nin en yenilikçi ve dijital oto servis platformu olmak.</p>
+                </div>
+                <div class="about-card">
+                    <h3><i class="fas fa-users"></i> Ekibimiz</h3>
+                    <p>Alanında uzman yazılımcı, tasarımcı ve oto servis danışmanlarından oluşan genç ve dinamik bir ekibiz.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="team-section-main">
+        <div class="team-container">
+            <h2>Projeyi Yapanlar</h2>
+            <div class="team-cards">
+                <div class="team-card">
+                    <div class="team-icon"><i class="fas fa-user-tie"></i></div>
+                    <div class="team-info">
+                        <h4>Mehmet Yusuf Yılıkoğlu</h4>
+                        <p>Proje Yöneticisi</p>
                     </div>
                 </div>
-                <div class="support-info">
-                    <h3>Destek Bilgileri</h3>
-                    <div class="info-item">
-                        <i class="fas fa-phone"></i>
-                        <p>0212 123 45 67</p>
+                <div class="team-card">
+                    <div class="team-icon"><i class="fas fa-code"></i></div>
+                    <div class="team-info">
+                        <h4>Cem Deniz Şahin</h4>
+                        <p>Yazılım Geliştirici</p>
                     </div>
-                    <div class="info-item">
-                        <i class="fas fa-envelope"></i>
-                        <p>destek@otoservis.com</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-icon"><i class="fas fa-code"></i></div>
+                    <div class="team-info">
+                        <h4>Mehmet Can Cankuş</h4>
+                        <p>Yazılım Geliştirici</p>
                     </div>
-                    <div class="info-item">
-                        <i class="fas fa-clock"></i>
-                        <p>Hafta içi: 09:00 - 18:00</p>
+                </div>
+            </div>
+            <div class="team-cards">
+                <div class="team-card">
+                    <div class="team-icon"><i class="fas fa-paint-brush"></i></div>
+                    <div class="team-info">
+                        <h4>Enver Alaş</h4>
+                        <p>Tasarım</p>
+                    </div>
+                </div>
+                <div class="team-card">
+                    <div class="team-icon"><i class="fas fa-paint-brush"></i></div>
+                    <div class="team-info">
+                        <h4>İbrahim Güneş</h4>
+                        <p>Tasarım</p>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="tab-content" id="about-tab">
-            <div class="about-container">
-                <h2>Hakkımızda</h2>
-                <div class="about-content">
-                    <div class="about-section">
-                        <h3><i class="fas fa-building"></i> Biz Kimiz?</h3>
-                        <p>UstaKapında, oto servis ve tamir hizmetlerini dijital platforma taşıyan yenilikçi bir platformdur. Müşterilerimiz ve servis sağlayıcılarımız arasında güvenilir bir köprü olmayı hedefliyoruz.</p>
+    <section class="leaflet-map-section">
+        <div class="leaflet-map-container">
+            <h2>Dükkanlar Haritası</h2>
+            <div id="leafletMap"></div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 UstaKapında. Tüm hakları saklıdır.</p>
+        </div>
+    </footer>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeRegisterModal">&times;</span>
+            <h2>Kayıt Ol</h2>
+            <div class="register-type">
+                <button class="register-type-btn active" data-type="user">Kullanıcı</button>
+                <button class="register-type-btn" data-type="shop">Dükkan</button>
+            </div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="name">İsim Soyisim</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Telefon Numarası</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">E-posta</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Şifre</label>
+                    <input type="password" id="password" name="password" required minlength="6">
+                </div>
+                <div class="form-group shop-only" style="display:none;">
+                    <label for="address">Adres</label>
+                    <input type="text" id="address" name="address">
+                </div>
+                <div class="form-group shop-only" style="display:none;">
+                    <label for="shopName">Dükkan Adı</label>
+                    <input type="text" id="shopName" name="shopName">
+                </div>
+                <div class="form-group shop-only" style="display:none; flex-direction: column; align-items: flex-start;">
+                    <label>Hizmetler</label>
+                    <div class="services-list">
+                        <label><input type="checkbox" name="services" value="Akü Servisi"> Akü Servisi</label>
+                        <label><input type="checkbox" name="services" value="Yağ Değişimi"> Yağ Değişimi</label>
+                        <label><input type="checkbox" name="services" value="Fren Bakımı"> Fren Bakımı</label>
+                        <label><input type="checkbox" name="services" value="Genel Bakım"> Genel Bakım</label>
+                        <label><input type="checkbox" name="services" value="Elektrik & Elektronik"> Elektrik & Elektronik</label>
+                        <label><input type="checkbox" name="services" value="Kaporta & Boya"> Kaporta & Boya</label>
                     </div>
-                    <div class="about-section">
-                        <h3><i class="fas fa-star"></i> Misyonumuz</h3>
-                        <p>Oto servis sektöründe şeffaflığı, güveni ve kaliteyi artırarak, müşterilerimizin araç bakım ve onarım ihtiyaçlarını en uygun şekilde karşılamak.</p>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;margin-top:10px;">Kayıt Ol</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeLoginModal">&times;</span>
+            <h2>Giriş Yap</h2>
+            <div class="register-type">
+                <button class="login-type-btn active" data-type="user">Kullanıcı</button>
+                <button class="login-type-btn" data-type="shop">Dükkan</button>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginIdentity">E-posta veya Telefon</label>
+                    <input type="text" id="loginIdentity" name="loginIdentity" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Şifre</label>
+                    <input type="password" id="loginPassword" name="loginPassword" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;margin-top:10px;">Giriş Yap</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="accountModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeAccountModal">&times;</span>
+            <h2>Hesabım</h2>
+            <div class="account-info">
+                <p><strong>Ad Soyad:</strong> Mehmet Yusuf Yılıkoğlu</p>
+                <p><strong>E-posta:</strong> ornek@mail.com</p>
+                <p><strong>Telefon:</strong> 0555 555 55 55</p>
+            </div>
+            <div class="account-actions">
+                <button class="btn btn-outline" id="logoutBtn">Çıkış Yap</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mesajlaşma Modalı -->
+    <div id="messagesModal" class="modal">
+        <div class="modal-content messages-modal">
+            <div class="modal-header">
+                <h2>Mesajlarım</h2>
+                <span class="close" id="closeMessagesModal">&times;</span>
+            </div>
+            <div class="messages-container">
+                <div class="conversations-list">
+                    <!-- Konuşmalar buraya dinamik olarak eklenecek -->
+                </div>
+                <div class="chat-container">
+                    <div id="messageContainer" class="message-container">
+                        <!-- Mesajlar buraya dinamik olarak eklenecek -->
                     </div>
-                    <div class="about-section">
-                        <h3><i class="fas fa-eye"></i> Vizyonumuz</h3>
-                        <p>Türkiye'nin en güvenilir ve kapsamlı oto servis platformu olmak, sektörde dijital dönüşümün öncüsü olmak.</p>
+                    <div id="typingIndicator" class="typing-indicator" style="display: none;">
+                        <span>Yazıyor...</span>
                     </div>
-                    <div class="about-section">
-                        <h3><i class="fas fa-handshake"></i> Değerlerimiz</h3>
-                        <ul>
-                            <li><i class="fas fa-check"></i> Müşteri Memnuniyeti</li>
-                            <li><i class="fas fa-check"></i> Şeffaflık</li>
-                            <li><i class="fas fa-check"></i> Güvenilirlik</li>
-                            <li><i class="fas fa-check"></i> Kalite</li>
-                            <li><i class="fas fa-check"></i> Yenilikçilik</li>
-                        </ul>
-                    </div>
-                    <div class="about-section team-section">
-                        <h3><i class="fas fa-users"></i> Emeği Geçenler</h3>
-                        <div class="team-grid">
-                            <div class="team-member">
-                                <div class="member-icon">
-                                    <i class="fas fa-user-tie"></i>
-                                </div>
-                                <h4>Proje Yöneticisi</h4>
-                                <p>Yusuf Yılıkoğlu</p>
-                            </div>
-                            <div class="team-member">
-                                <div class="member-icon">
-                                    <i class="fas fa-code"></i>
-                                </div>
-                                <h4>Yazılım Geliştirici</h4>
-                                <p>Cem Deniz Şahin<br>Mehmet Can Cankuş</p>
-                            </div>
-                            <div class="team-member">
-                                <div class="member-icon">
-                                    <i class="fas fa-paint-brush"></i>
-                                </div>
-                                <h4>Tasarım Ekibi</h4>
-                                <p>İbrahim Güneş<br>Enver Alaş</p>
-                            </div>
-                        </div>
-                        <div class="team-thanks">
-                            <p><i class="fas fa-heart"></i> UstaKapında'nın başarısında emeği geçen tüm ekip arkadaşlarımıza teşekkür ederiz.</p>
-                        </div>
+                    <div class="message-input-container">
+                        <input type="text" id="messageInput" placeholder="Mesajınızı yazın...">
+                        <button id="sendMessageBtn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <!-- Canlı Destek Chat Widget -->
+    <div class="chatbot-container">
+        <button class="chatbot-emoji" type="button">
+            <span>💬</span>
+        </button>
+        <div class="chatbot-window">
+            <div class="chatbot-header">
+                <span>Canlı Destek</span>
+                <button class="close-btn" type="button">×</button>
+            </div>
+            <div class="chatbot-body">
+                <div class="chat-messages">
+                    <div class="message bot">
+                        Merhaba! Size nasıl yardımcı olabilirim?
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" placeholder="Mesajınızı yazın...">
+                    <button type="button" id="sendChatMessage">Gönder</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/script.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 </body>
 </html>
