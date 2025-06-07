@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Yönetimi</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .profile-container { max-width: 500px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 0 20px #0001; padding: 30px; }
+        .profile-container h2 { text-align: center; color: #3498db; }
+        .profile-container label { font-weight: 600; margin-top: 15px; display: block; }
+        .profile-container input, .profile-container select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 4px; border: 1px solid #ddd; }
+        .profile-container .services-list { margin: 10px 0; }
+        .profile-container .services-list label { font-weight: normal; display: block; margin-left: 10px; }
+        .profile-container .profile-photo-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 10px auto; display: block; border: 1px solid #ccc; }
+        .profile-container button { width: 100%; margin-top: 20px; background: #3498db; color: #fff; border: none; padding: 12px; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        .profile-container button:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <h2>Profilim</h2>
+        <form id="profileForm" enctype="multipart/form-data">
+            <label for="profilePhoto">Profil Fotoğrafı</label>
+            <input type="file" id="profilePhoto" name="profilePhoto" accept="image/*">
+            <img id="photoPreview" class="profile-photo-preview" src="" alt="Profil Fotoğrafı" style="display:none;">
+
+            <label for="name">Ad Soyad</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">E-posta</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="phone">Telefon</label>
+            <input type="tel" id="phone" name="phone" required>
+
+            <label for="password">Şifre (değiştirmek için doldurun)</label>
+            <input type="password" id="password" name="password" minlength="6">
+
+            <div class="services-list">
+                <label>Verdiğiniz Hizmetler</label>
+                <label><input type="checkbox" name="services" value="Akü Servisi"> Akü Servisi</label>
+                <label><input type="checkbox" name="services" value="Yağ Değişimi"> Yağ Değişimi</label>
+                <label><input type="checkbox" name="services" value="Fren Bakımı"> Fren Bakımı</label>
+                <label><input type="checkbox" name="services" value="Genel Bakım"> Genel Bakım</label>
+                <label><input type="checkbox" name="services" value="Elektrik & Elektronik"> Elektrik & Elektronik</label>
+                <label><input type="checkbox" name="services" value="Kaporta & Boya"> Kaporta & Boya</label>
+            </div>
+
+            <button type="submit">Kaydet</button>
+        </form>
+    </div>
+    <script src="js/profile.js"></script>
+</body>
+</html> 
