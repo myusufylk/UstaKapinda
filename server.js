@@ -62,10 +62,10 @@ const notificationRoutes = require('./routes/notifications');
 const paymentRoutes = require('./routes/payments');
 const reviewRoutes = require('./routes/reviews');
 const notificationPreferencesRouter = require('./routes/notificationPreferences');
-const hasarTespitRouter = require('./routes/hasar-tespit');
+const arizaTespitRouter = require('./routes/ariza-tespit');
 
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api', userRoutes);
 app.use('/api/craftsmen', craftsmanRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -73,7 +73,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/notification-preferences', notificationPreferencesRouter);
-app.use('/hasar-tespit', hasarTespitRouter);
+app.use('/ariza-tespit', arizaTespitRouter);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));

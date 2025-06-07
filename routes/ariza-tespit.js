@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 
-// Hasar tespit sayfasını göster
+// Arıza tespit sayfasını göster
 router.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/hasar-tespit.html'));
+    res.sendFile(path.join(__dirname, '../public/ariza-tespit.html'));
 });
 
-// Hasar tespit formunu işle
+// Arıza tespit formunu işle
 router.post('/submit', async (req, res) => {
     try {
         // Form verilerini al
@@ -15,21 +15,21 @@ router.post('/submit', async (req, res) => {
             carBrand,
             carModel,
             carYear,
-            damageDate,
-            damageTime,
-            damageCause,
-            damageAreas,
+            faultDate,
+            faultTime,
+            faultSymptom,
+            faultAreas,
             engineIssues,
             electricalIssues,
             additionalNotes
         } = req.body;
 
-        // Hasar türünü belirle
-        let damageType = 'genel';
-        if (damageAreas.includes('engine') || damageAreas.includes('chassis')) {
-            damageType = 'mekanik';
-        } else if (damageAreas.some(area => ['frontBumper', 'rearBumper', 'rightFrontDoor', 'leftRearDoor'].includes(area))) {
-            damageType = 'karoseri';
+        // Arıza türünü belirle
+        let faultType = 'genel';
+        if (faultAreas.includes('engine') || faultAreas.includes('chassis')) {
+            faultType = 'mekanik';
+        } else if (faultAreas.some(area => ['frontBumper', 'rearBumper', 'rightFrontDoor', 'leftRearDoor'].includes(area))) {
+            faultType = 'karoseri';
         }
 
         // Sonuç döndür
@@ -41,12 +41,12 @@ router.post('/submit', async (req, res) => {
                     model: carModel,
                     year: carYear
                 },
-                damageInfo: {
-                    type: damageType,
-                    areas: damageAreas,
-                    cause: damageCause,
-                    date: damageDate,
-                    time: damageTime
+                faultInfo: {
+                    type: faultType,
+                    areas: faultAreas,
+                    symptom: faultSymptom,
+                    date: faultDate,
+                    time: faultTime
                 },
                 issues: {
                     engine: engineIssues,
@@ -56,10 +56,10 @@ router.post('/submit', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Hasar tespit formu işlenirken hata:', error);
+        console.error('Arıza tespit formu işlenirken hata:', error);
         res.status(500).json({
             success: false,
-            error: 'Hasar tespit formu işlenirken bir hata oluştu'
+            error: 'Arıza tespit formu işlenirken bir hata oluştu'
         });
     }
 });

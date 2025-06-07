@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Araç Arıza Tespit Sistemi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .form-section h2 {
+            color: #3498db;
+            margin-top: 0;
+            font-size: 1.3em;
+        }
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: 600;
+        }
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .checkbox-group {
+            margin: 10px 0;
+        }
+        .checkbox-group label {
+            display: inline-block;
+            margin-left: 5px;
+            font-weight: normal;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #photoUpload {
+            display: none;
+        }
+        .upload-btn {
+            background-color: #2ecc71;
+            padding: 10px 15px;
+            display: inline-block;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        .preview-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .preview-images img {
+            max-width: 100px;
+            max-height: 100px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .fault-result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f4fc;
+            border-radius: 8px;
+            display: none;
+        }
+        .progress-bar {
+            height: 5px;
+            background-color: #ecf0f1;
+            margin-bottom: 20px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background-color: #3498db;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+    <link rel="stylesheet" href="js/leaflet.css" />
+    <link rel="stylesheet" href="js/MarkerCluster.css" />
+    <link rel="stylesheet" href="js/MarkerCluster.Default.css" />
+</head>
+<body>
+    <div class="form-container">
+        <h1>🚗 Araç Arıza Tespit Sistemi</h1>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progressBar"></div>
+        </div>
+        
+        <form id="faultForm">
+            <!-- Bölüm 1: Genel Bilgiler -->
+            <div class="form-section" id="section1">
+                <h2>1. Genel Bilgiler</h2>
+                
+                <label for="carBrand">Aracınızın Markası:</label>
+                <select id="carBrand" required>
+                    <option value="">Seçiniz</option>
+                    <option value="audi">Audi</option>
+                    <option value="bmw">BMW</option>
+                    <option value="mercedes">Mercedes</option>
+                    <option value="volkswagen">Volkswagen</option>
+                    <option value="ford">Ford</option>
+                    <option value="toyota">Toyota</option>
+                    <option value="honda">Honda</option>
+                    <option value="other">Diğer</option>
+                </select>
+                
+                <label for="carModel">Aracınızın Modeli:</label>
+                <input type="text" id="carModel" required placeholder="Örnek: Golf 1.6 TDI Comfortline">
+                
+                <label for="carYear">Aracınızın Üretim Yılı:</label>
+                <select id="carYear" required>
+                    <option value="">Seçiniz</option>
+                </select>
+            </div>
+            
+            <!-- Bölüm 2: Arıza Detayları -->
+            <div class="form-section" id="section2" style="display: none;">
+                <h2>2. Arıza Detayları</h2>
+                
+                <label>Arıza Belirtisi:</label>
+                <select id="faultSymptom" required>
+                    <option value="">Seçiniz</option>
+                    <option value="engine">Motor Sorunu</option>
+                    <option value="electrical">Elektrik Sorunu</option>
+                    <option value="mechanical">Mekanik Sorun</option>
+                    <option value="other">Diğer</option>
+                </select>
+                
+                <label for="faultDescription">Arıza ile ilgili bilgi:</label>
+                <textarea id="faultDescription" required placeholder="Arızayı detaylı şekilde yazınız"></textarea>
+            </div>
+            
+            <!-- Bölüm 3: Mekanik/ELEKTRİK Problemleri -->
+            <div class="form-section" id="section3" style="display: none;">
+                <h2>3. Mekanik/Elektrik Problemleri</h2>
+                
+                <label>Motorla İlgili Bir Problem Var mı?</label>
+                <select id="engineIssue">
+                    <option value="no">Hayır</option>
+                    <option value="yes">Evet</option>
+                </select>
+                
+                <div id="engineDetails" style="display: none; margin-top: 15px;">
+                    <label>Motor Problemi Detayları:</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="abnormalSound" name="engineProblems" value="abnormalSound">
+                        <label for="abnormalSound">Anormal Ses</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="warningLight" name="engineProblems" value="warningLight">
+                        <label for="warningLight">Uyarı Işığı Yanıyor</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="performanceLoss" name="engineProblems" value="performanceLoss">
+                        <label for="performanceLoss">Performans Düşüşü</label>
+                    </div>
+                    
+                    <label for="engineProblemDesc">Açıklama:</label>
+                    <textarea id="engineProblemDesc" rows="3" placeholder="Motorla ilgili yaşadığınız problemi detaylı açıklayın"></textarea>
+                </div>
+                
+                <label style="margin-top: 20px;">Elektrik Sistemlerinde Problem Var mı?</label>
+                <select id="electricalIssue">
+                    <option value="no">Hayır</option>
+                    <option value="yes">Evet</option>
+                </select>
+                
+                <div id="electricalDetails" style="display: none; margin-top: 15px;">
+                    <label>Elektrik Problemleri:</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="windowIssue" name="electricalProblems" value="windowIssue">
+                        <label for="windowIssue">Camlar Çalışmıyor</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="lockIssue" name="electricalProblems" value="lockIssue">
+                        <label for="lockIssue">Kilitler Çalışmıyor</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="lightingIssue" name="electricalProblems" value="lightingIssue">
+                        <label for="lightingIssue">Aydınlatma Problemleri</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="batteryIssue" name="electricalProblems" value="batteryIssue">
+                        <label for="batteryIssue">Akü Problemi</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bölüm 4: Fotoğraf Yükleme -->
+            <div class="form-section" id="section4" style="display: none;">
+                <h2>4. Görsel Belgeleme</h2>
+                
+                <label>Arıza Fotoğrafları (En az 3 farklı açıdan):</label>
+                <input type="file" id="photoUpload" accept="image/*" multiple>
+                <label for="photoUpload" class="upload-btn">📸 Fotoğraf Yükle</label>
+                
+                <div class="preview-images" id="imagePreview"></div>
+                
+                <label style="margin-top: 20px;">Ek Açıklamalar:</label>
+                <textarea id="additionalNotes" rows="4" placeholder="Eklemek istediğiniz başka bilgiler..."></textarea>
+            </div>
+            
+            <button type="button" id="prevBtn" style="display: none; width: auto; margin-right: 10px;">← Önceki</button>
+            <button type="button" id="nextBtn">Sonraki →</button>
+            <button type="submit" id="submitBtn" style="display: none;">Arıza Tespitini Tamamla</button>
+        </form>
+        
+        <div class="fault-result" id="faultResult">
+            <h2>Arıza Tespit Sonucu</h2>
+            <div id="resultContent"></div>
+            <div id="map" style="width:100%;height:400px;margin-top:20px;display:none;"></div>
+            <button id="findWorkshopBtn" style="margin-top: 20px;">En Yakın Tamirciyi Bul</button>
+        </div>
+    </div>
+
+    <script src="js/ariza-tespit-yil.js"></script>
+    <script src="js/ariza-tespit-form.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/leaflet.markercluster.js"></script>
+    <script src="js/harita-entegrasyon.js"></script>
+</body>
+</html> 
