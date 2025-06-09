@@ -150,6 +150,18 @@ window.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Giriş modalı için kullanıcı/dükkan seçimi
+    const loginTypeBtns = document.querySelectorAll('.login-type-btn');
+    if (loginTypeBtns.length) {
+        loginTypeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                loginTypeBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                // Eğer dükkan için ekstra alanlar göstermek istersen buraya ekleyebilirsin
+            });
+        });
+    }
+
     // Form submit örneği
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
@@ -157,18 +169,22 @@ window.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             
             const formData = new FormData(registerForm);
+            const userType = document.querySelector('.register-type-btn.active').dataset.type;
+            
             const userData = {
                 email: formData.get('email'),
                 password: formData.get('password'),
                 name: formData.get('name'),
-                phone: formData.get('phone'),
-                type: document.querySelector('.register-type-btn.active').dataset.type,
-                address: formData.get('address'),
-                services: Array.from(formData.getAll('services'))
+                phone: formData.get('phone')
             };
 
+            if (userType === 'shop') {
+                userData.address = formData.get('address');
+                userData.services = Array.from(formData.getAll('services'));
+            }
+
             try {
-                const response = await fetch('/api/auth/register', {
+                const response = await fetch(`/api/auth/register/${userType}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -186,7 +202,7 @@ window.addEventListener('DOMContentLoaded', function() {
                     typeBtns[1].classList.remove('active');
                     shopOnlyFields.forEach(el => el.style.display = 'none');
                 } else {
-                    alert(data.message || 'Kayıt sırasında bir hata oluştu');
+                    alert(data.error || 'Kayıt sırasında bir hata oluştu');
                 }
             } catch (error) {
                 console.error('Kayıt hatası:', error);
@@ -202,14 +218,15 @@ window.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             
             const formData = new FormData(loginForm);
+            const userType = document.querySelector('.login-type-btn.active').dataset.type;
+            
             const loginData = {
-                email: formData.get('email'),
-                password: formData.get('password'),
-                type: document.querySelector('.login-type-btn.active').dataset.type
+                email: formData.get('loginIdentity'),
+                password: formData.get('loginPassword')
             };
 
             try {
-                const response = await fetch('/api/auth/login', {
+                const response = await fetch(`/api/auth/login/${userType}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -222,11 +239,12 @@ window.addEventListener('DOMContentLoaded', function() {
                 if (response.ok) {
                     // Token'ı localStorage'a kaydet
                     localStorage.setItem('token', data.token);
-                    localStorage.setItem('userType', data.userType);
-                    localStorage.setItem('userId', data.userId);
+                    localStorage.setItem('userType', userType);
+                    localStorage.setItem('userId', userType === 'user' ? data.user.id : data.shop.id);
+                    localStorage.setItem('userName', userType === 'user' ? data.user.name : data.shop.name);
 
                     // Kullanıcı menüsünü güncelle
-                    updateUserMenu(data.userType, data.name);
+                    updateUserMenu(userType, userType === 'user' ? data.user.name : data.shop.name);
 
                     alert('Giriş başarılı!');
                     loginModal.style.display = 'none';
@@ -234,7 +252,7 @@ window.addEventListener('DOMContentLoaded', function() {
                     loginTypeBtns[0].classList.add('active');
                     loginTypeBtns[1].classList.remove('active');
                 } else {
-                    alert(data.message || 'Giriş sırasında bir hata oluştu');
+                    alert(data.error || 'Giriş sırasında bir hata oluştu');
                 }
             } catch (error) {
                 console.error('Giriş hatası:', error);
@@ -279,6 +297,7 @@ window.addEventListener('DOMContentLoaded', function() {
                     localStorage.removeItem('token');
                     localStorage.removeItem('userType');
                     localStorage.removeItem('userId');
+                    localStorage.removeItem('userName');
                     window.location.reload();
                 });
             }
@@ -298,11 +317,12 @@ window.addEventListener('DOMContentLoaded', function() {
                 
                 if (response.ok) {
                     const data = await response.json();
-                    updateUserMenu(data.userType, data.name);
+                    updateUserMenu(data.userType, data.userName);
                 } else {
                     localStorage.removeItem('token');
                     localStorage.removeItem('userType');
                     localStorage.removeItem('userId');
+                    localStorage.removeItem('userName');
                 }
             } catch (error) {
                 console.error('Token doğrulama hatası:', error);

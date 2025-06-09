@@ -2,22 +2,23 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Shop = require('../models/Shop');
 const { auth } = require('../middleware/auth');
-const { userValidationRules, validate } = require('../middleware/validator');
+const { userValidationRules, shopValidationRules, validate } = require('../middleware/validator');
 const { sendVerificationEmail, sendPasswordResetEmail } = require('../utils/email');
 
-// Register new user
-router.post('/register', userValidationRules(), validate, async (req, res) => {
+// Kullanıcı kaydı
+router.post('/register/user', userValidationRules(), validate, async (req, res) => {
     try {
         const { name, email, password, phone } = req.body;
 
-        // Check if user already exists
+        // Kullanıcı zaten var mı kontrol et
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ error: 'Email already registered' });
+            return res.status(400).json({ error: 'Bu e-posta adresi zaten kayıtlı' });
         }
 
-        // Create new user
+        // Yeni kullanıcı oluştur
         const user = new User({
             name,
             email,
@@ -27,25 +28,25 @@ router.post('/register', userValidationRules(), validate, async (req, res) => {
 
         await user.save();
 
-        // Generate verification token
+        // Doğrulama tokeni oluştur
         const verificationToken = jwt.sign(
             { userId: user._id },
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
 
-        // Send verification email
+        // Doğrulama e-postası gönder
         await sendVerificationEmail(user.email, verificationToken);
 
-        // Generate auth token
+        // Auth token oluştur
         const token = jwt.sign(
-            { userId: user._id },
+            { userId: user._id, type: 'user' },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         );
 
         res.status(201).json({
-            message: 'User registered successfully',
+            message: 'Kullanıcı başarıyla kaydedildi',
             token,
             user: {
                 id: user._id,
@@ -55,30 +56,80 @@ router.post('/register', userValidationRules(), validate, async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({ error: 'Error registering user' });
+        res.status(500).json({ error: 'Kullanıcı kaydı sırasında bir hata oluştu' });
     }
 });
 
-// Login user
-router.post('/login', async (req, res) => {
+// Dükkan kaydı
+router.post('/register/shop', shopValidationRules(), validate, async (req, res) => {
+    try {
+        const { name, email, password, phone, address, services } = req.body;
+
+        // Dükkan zaten var mı kontrol et
+        const existingShop = await Shop.findOne({ email });
+        if (existingShop) {
+            return res.status(400).json({ error: 'Bu e-posta adresi zaten kayıtlı' });
+        }
+
+        // Yeni dükkan oluştur
+        const shop = new Shop({
+            name,
+            email,
+            password,
+            phone,
+            address,
+            services,
+            isVerified: true // Doğrulamayı otomatik olarak true yapıyoruz
+        });
+
+        await shop.save();
+
+        // Auth token oluştur
+        const token = jwt.sign(
+            { shopId: shop._id, type: 'shop' },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        res.status(201).json({
+            message: 'Dükkan başarıyla kaydedildi',
+            token,
+            shop: {
+                id: shop._id,
+                name: shop.name,
+                email: shop.email
+            }
+        });
+    } catch (error) {
+        console.error('Dükkan kaydı hatası:', error);
+        res.status(500).json({ error: 'Dükkan kaydı sırasında bir hata oluştu' });
+    }
+});
+
+// Kullanıcı girişi
+router.post('/login/user', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Find user
-        const user = await User.findOne({ email });
+        // E-posta mı telefon mu kontrolü
+        const user = await User.findOne(
+            email.includes('@')
+                ? { email }
+                : { phone: email }
+        );
         if (!user) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Geçersiz kimlik bilgileri' });
         }
 
-        // Check password
+        // Şifreyi kontrol et
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Geçersiz kimlik bilgileri' });
         }
 
-        // Generate token
+        // Token oluştur
         const token = jwt.sign(
-            { userId: user._id },
+            { userId: user._id, type: 'user' },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         );
@@ -93,28 +144,84 @@ router.post('/login', async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({ error: 'Error logging in' });
+        res.status(500).json({ error: 'Giriş sırasında bir hata oluştu' });
     }
 });
 
-// Verify email
-router.get('/verify/:token', async (req, res) => {
+// Dükkan girişi
+router.post('/login/shop', async (req, res) => {
     try {
-        const { token } = req.params;
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        const user = await User.findById(decoded.userId);
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+        const { email, password } = req.body;
+
+        // E-posta mı telefon mu kontrolü
+        const shop = await Shop.findOne(
+            email.includes('@')
+                ? { email }
+                : { phone: email }
+        );
+        if (!shop) {
+            return res.status(401).json({ error: 'Geçersiz kimlik bilgileri' });
         }
 
-        user.isVerified = true;
-        user.verificationToken = undefined;
-        await user.save();
+        // Şifreyi kontrol et
+        const isMatch = await shop.comparePassword(password);
+        if (!isMatch) {
+            return res.status(401).json({ error: 'Geçersiz kimlik bilgileri' });
+        }
 
-        res.json({ message: 'Email verified successfully' });
+        // Token oluştur
+        const token = jwt.sign(
+            { shopId: shop._id, type: 'shop' },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        res.json({
+            token,
+            shop: {
+                id: shop._id,
+                name: shop.name,
+                email: shop.email
+            }
+        });
     } catch (error) {
-        res.status(400).json({ error: 'Invalid or expired token' });
+        res.status(500).json({ error: 'Giriş sırasında bir hata oluştu' });
+    }
+});
+
+// Token doğrulama
+router.get('/verify', auth, async (req, res) => {
+    try {
+        if (req.user.type === 'user') {
+            const user = await User.findById(req.user.userId);
+            if (!user) {
+                return res.status(404).json({ error: 'Kullanıcı bulunamadı' });
+            }
+            res.json({
+                type: 'user',
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                }
+            });
+        } else if (req.user.type === 'shop') {
+            const shop = await Shop.findById(req.user.shopId);
+            if (!shop) {
+                return res.status(404).json({ error: 'Dükkan bulunamadı' });
+            }
+            res.json({
+                type: 'shop',
+                shop: {
+                    id: shop._id,
+                    name: shop.name,
+                    email: shop.email
+                }
+            });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Token doğrulama sırasında bir hata oluştu' });
     }
 });
 
