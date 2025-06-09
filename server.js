@@ -42,12 +42,12 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // Database connection
-mongoose.connect('mongodb://localhost:27017/ustakapinda', {
+mongoose.connect('mongodb://127.0.0.1:27017/ustakapinda', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+.then(() => console.log('MongoDB bağlantısı başarılı'))
+.catch(err => console.error('MongoDB bağlantı hatası:', err));
 
 // WebSocket connection handling
 // Mesajlaşma ve Socket.IO ile ilgili kodlar kaldırıldı

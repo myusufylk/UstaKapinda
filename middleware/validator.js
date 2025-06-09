@@ -1,24 +1,79 @@
 const { body, validationResult } = require('express-validator');
 
-// Validation middleware
-const validate = (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-};
-
-// User validation rules
+// Kullanıcı validasyon kuralları
 const userValidationRules = () => {
     return [
-        body('name').trim().notEmpty().withMessage('Name is required'),
-        body('email').isEmail().withMessage('Valid email is required'),
+        body('name')
+            .trim()
+            .notEmpty().withMessage('İsim alanı zorunludur')
+            .isLength({ min: 2 }).withMessage('İsim en az 2 karakter olmalıdır'),
+        
+        body('email')
+            .trim()
+            .notEmpty().withMessage('E-posta alanı zorunludur')
+            .isEmail().withMessage('Geçerli bir e-posta adresi giriniz'),
+        
         body('password')
-            .isLength({ min: 6 })
-            .withMessage('Password must be at least 6 characters long'),
-        body('phone').notEmpty().withMessage('Phone number is required')
+            .trim()
+            .notEmpty().withMessage('Şifre alanı zorunludur')
+            .isLength({ min: 6 }).withMessage('Şifre en az 6 karakter olmalıdır'),
+        
+        body('phone')
+            .trim()
+            .notEmpty().withMessage('Telefon alanı zorunludur')
+            .matches(/^[0-9]{10}$/).withMessage('Geçerli bir telefon numarası giriniz')
     ];
+};
+
+// Dükkan validasyon kuralları
+const shopValidationRules = () => {
+    return [
+        body('name')
+            .trim()
+            .notEmpty().withMessage('Dükkan adı zorunludur')
+            .isLength({ min: 2 }).withMessage('Dükkan adı en az 2 karakter olmalıdır'),
+        
+        body('email')
+            .trim()
+            .notEmpty().withMessage('E-posta alanı zorunludur')
+            .isEmail().withMessage('Geçerli bir e-posta adresi giriniz'),
+        
+        body('password')
+            .trim()
+            .notEmpty().withMessage('Şifre alanı zorunludur')
+            .isLength({ min: 6 }).withMessage('Şifre en az 6 karakter olmalıdır'),
+        
+        body('phone')
+            .trim()
+            .notEmpty().withMessage('Telefon alanı zorunludur')
+            .matches(/^[0-9]{10}$/).withMessage('Geçerli bir telefon numarası giriniz'),
+        
+        body('address')
+            .trim()
+            .notEmpty().withMessage('Adres alanı zorunludur')
+            .isLength({ min: 10 }).withMessage('Adres en az 10 karakter olmalıdır'),
+        
+        body('services')
+            .isArray().withMessage('Hizmetler bir dizi olmalıdır')
+            .notEmpty().withMessage('En az bir hizmet seçilmelidir')
+    ];
+};
+
+// Validasyon sonuçlarını kontrol et
+const validate = (req, res, next) => {
+    const errors = validationResult(req);
+    if (errors.isEmpty()) {
+        return next();
+    }
+    
+    const extractedErrors = errors.array().map(err => ({
+        field: err.param,
+        message: err.msg
+    }));
+    
+    return res.status(400).json({
+        errors: extractedErrors
+    });
 };
 
 // Job validation rules
@@ -64,8 +119,9 @@ const reviewValidationRules = () => {
 };
 
 module.exports = {
-    validate,
     userValidationRules,
+    shopValidationRules,
+    validate,
     jobValidationRules,
     craftsmanValidationRules,
     reviewValidationRules
