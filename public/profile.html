@@ -5,51 +5,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil Yönetimi</title>
     <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .profile-container { max-width: 500px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 0 20px #0001; padding: 30px; }
-        .profile-container h2 { text-align: center; color: #3498db; }
-        .profile-container label { font-weight: 600; margin-top: 15px; display: block; }
-        .profile-container input, .profile-container select { width: 100%; padding: 10px; margin-top: 5px; border-radius: 4px; border: 1px solid #ddd; }
-        .profile-container .services-list { margin: 10px 0; }
-        .profile-container .services-list label { font-weight: normal; display: block; margin-left: 10px; }
-        .profile-container .profile-photo-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 10px auto; display: block; border: 1px solid #ccc; }
-        .profile-container button { width: 100%; margin-top: 20px; background: #3498db; color: #fff; border: none; padding: 12px; border-radius: 4px; font-size: 16px; cursor: pointer; }
-        .profile-container button:hover { background: #2980b9; }
+        body { background: #f5f6fa; }
+        .profile-container { max-width: 480px; margin: 40px auto; background: #fff; border-radius: 18px; box-shadow: 0 0 24px #0002; padding: 36px 32px 28px 32px; }
+        .profile-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; }
+        .profile-photo-preview { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid #3498db; background: #f5f6fa; box-shadow: 0 2px 8px #0001; margin-bottom: 10px; }
+        .profile-photo-upload { margin-bottom: 8px; }
+        .profile-title { font-size: 1.5rem; color: #3498db; font-weight: bold; margin-bottom: 2px; }
+        .profile-form-group { display: flex; align-items: center; margin-bottom: 18px; background: #f7fafd; border-radius: 8px; padding: 8px 12px; box-shadow: 0 1px 4px #0001; }
+        .profile-form-group i { color: #3498db; font-size: 1.1rem; margin-right: 10px; min-width: 22px; text-align: center; }
+        .profile-form-group input { border: none; background: transparent; width: 100%; font-size: 1rem; padding: 8px 0; outline: none; }
+        .profile-form-group input:disabled { color: #aaa; }
+        .profile-form-group input[type="password"] { letter-spacing: 2px; }
+        .profile-form-group input::placeholder { color: #bbb; }
+        .profile-form-group .show-password { cursor: pointer; color: #888; margin-left: 8px; }
+        .profile-form-group .show-password:hover { color: #3498db; }
+        .profile-form-group .change-password-btn { background: none; border: none; color: #3498db; cursor: pointer; font-size: 0.98rem; margin-left: 8px; }
+        .profile-form-group .change-password-btn:hover { text-decoration: underline; }
+        .profile-form-group .password-fields { display: none; flex-direction: column; width: 100%; }
+        .profile-form-group.password-active .password-fields { display: flex; }
+        .services-list { margin: 18px 0 0 0; }
+        .services-label { font-weight: 600; color: #217dbb; margin-bottom: 8px; }
+        .service-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+        .service-tag { background: #f0f6ff; color: #217dbb; border: 1px solid #b3d4fc; border-radius: 7px; padding: 7px 16px; font-size: 0.98rem; cursor: pointer; display: flex; align-items: center; transition: background 0.2s, color 0.2s; }
+        .service-tag input { margin-right: 7px; accent-color: #3498db; }
+        .service-tag.selected, .service-tag input:checked + span { background: #3498db; color: #fff; border-color: #3498db; }
+        .profile-save-btn { width: 100%; margin-top: 28px; background: #3498db; color: #fff; border: none; padding: 14px; border-radius: 6px; font-size: 1.1rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px #3498db22; transition: background 0.2s; }
+        .profile-save-btn:hover { background: #217dbb; }
+        @media (max-width: 600px) { .profile-container { padding: 16px 4px; } }
     </style>
 </head>
 <body>
     <div class="profile-container">
-        <h2>Profilim</h2>
         <form id="profileForm" enctype="multipart/form-data">
-            <label for="profilePhoto">Profil Fotoğrafı</label>
-            <input type="file" id="profilePhoto" name="profilePhoto" accept="image/*">
-            <img id="photoPreview" class="profile-photo-preview" src="" alt="Profil Fotoğrafı" style="display:none;">
-
-            <label for="name">Ad Soyad</label>
-            <input type="text" id="name" name="name" required>
-
-            <label for="email">E-posta</label>
-            <input type="email" id="email" name="email" required>
-
-            <label for="phone">Telefon</label>
-            <input type="tel" id="phone" name="phone" required>
-
-            <label for="password">Şifre (değiştirmek için doldurun)</label>
-            <input type="password" id="password" name="password" minlength="6">
-
-            <div class="services-list">
-                <label>Verdiğiniz Hizmetler</label>
-                <label><input type="checkbox" name="services" value="Akü Servisi"> Akü Servisi</label>
-                <label><input type="checkbox" name="services" value="Yağ Değişimi"> Yağ Değişimi</label>
-                <label><input type="checkbox" name="services" value="Fren Bakımı"> Fren Bakımı</label>
-                <label><input type="checkbox" name="services" value="Genel Bakım"> Genel Bakım</label>
-                <label><input type="checkbox" name="services" value="Elektrik & Elektronik"> Elektrik & Elektronik</label>
-                <label><input type="checkbox" name="services" value="Kaporta & Boya"> Kaporta & Boya</label>
+            <div class="profile-header" style="flex-direction:column;align-items:center;">
+                <div style="width:120px;height:120px;border-radius:50%;background:#e3f0fc;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 8px #3498db22;margin-bottom:8px;">
+                    <img id="photoPreview" class="profile-photo-preview" src="" alt="Profil Fotoğrafı" style="width:100%;height:100%;object-fit:cover;display:none;">
+                </div>
+                <div style="font-size:0.98rem;color:#3498db;margin-bottom:4px;">Profil Fotoğrafı</div>
+                <input type="file" id="profilePhoto" name="profilePhoto" accept="image/*" class="profile-photo-upload" style="margin-bottom:10px;width:140px;display:block;margin-left:auto;margin-right:auto;">
+                <div class="profile-title">Profilim</div>
             </div>
-
-            <button type="submit">Kaydet</button>
+            <div class="profile-form-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="name" name="name" required placeholder="Adınız ve Soyadınız">
+            </div>
+            <div class="profile-form-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="email" name="email" required placeholder="E-posta adresiniz">
+            </div>
+            <div class="profile-form-group">
+                <i class="fas fa-phone"></i>
+                <input type="tel" id="phone" name="phone" required placeholder="Telefon numaranız">
+            </div>
+            <div class="profile-form-group" id="passwordGroup">
+                <i class="fas fa-lock"></i>
+                <button type="button" class="change-password-btn" id="changePasswordBtn">Şifre Değiştir</button>
+                <div class="password-fields" id="passwordFields">
+                    <input type="password" id="oldPassword" name="oldPassword" placeholder="Mevcut şifreniz" required>
+                    <input type="password" id="password" name="password" minlength="6" placeholder="Yeni şifre (en az 6 karakter)" style="margin-top:8px;">
+                    <small style="color:#888;display:block;margin-top:6px;">Şifrenizi değiştirmek için önce mevcut şifrenizi girin.</small>
+                </div>
+            </div>
+            <div class="profile-form-group" style="background:#e3f0fc;border:1.5px solid #3498db;box-shadow:0 1px 4px #3498db22;justify-content:center;">
+                <i class="fas fa-store"></i>
+                <label style="margin-left:8px;font-weight:700;color:#217dbb;">Dükkan Durumu:</label>
+                <input type="checkbox" id="isOpen" name="isOpen" style="margin-left:18px;transform:scale(1.5);">
+                <span id="isOpenLabel" style="margin-left:12px;font-weight:600;color:#217dbb;">Açık</span>
+            </div>
+            <div class="services-list">
+                <div class="services-label">Verdiğiniz Hizmetler</div>
+                <div class="service-tags">
+                    <label class="service-tag"><input type="checkbox" name="services" value="Akü Servisi"><span>Akü Servisi</span></label>
+                    <label class="service-tag"><input type="checkbox" name="services" value="Yağ Değişimi"><span>Yağ Değişimi</span></label>
+                    <label class="service-tag"><input type="checkbox" name="services" value="Fren Bakımı"><span>Fren Bakımı</span></label>
+                    <label class="service-tag"><input type="checkbox" name="services" value="Genel Bakım"><span>Genel Bakım</span></label>
+                    <label class="service-tag"><input type="checkbox" name="services" value="Elektrik & Elektronik"><span>Elektrik & Elektronik</span></label>
+                    <label class="service-tag"><input type="checkbox" name="services" value="Kaporta & Boya"><span>Kaporta & Boya</span></label>
+                </div>
+            </div>
+            <button type="submit" class="profile-save-btn">Kaydet</button>
         </form>
     </div>
     <script src="js/profile.js"></script>
+    <script>
+    // Şifre değiştirme alanı açma
+    document.addEventListener('DOMContentLoaded', function() {
+        const changeBtn = document.getElementById('changePasswordBtn');
+        const passwordFields = document.getElementById('passwordFields');
+        const group = document.getElementById('passwordGroup');
+        if(changeBtn && passwordFields && group) {
+            changeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                group.classList.toggle('password-active');
+                passwordFields.querySelector('input').focus();
+            });
+        }
+        // Hizmetler için seçili class
+        document.querySelectorAll('.service-tag input[type="checkbox"]').forEach(cb => {
+            cb.addEventListener('change', function() {
+                if(cb.checked) cb.parentElement.classList.add('selected');
+                else cb.parentElement.classList.remove('selected');
+            });
+            if(cb.checked) cb.parentElement.classList.add('selected');
+        });
+    });
+    </script>
 </body>
 </html> 

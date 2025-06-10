@@ -13,6 +13,10 @@ body {
     color: #fff;
 }
 
+body.appointments-page {
+    background: #f5f6fa !important;
+}
+
 .background-images {
     position: fixed;
     top: 0;
@@ -1515,4 +1519,40 @@ body {
     background: #3498db;
     color: #fff;
     border: 2px solid #217dbb;
+}
+
+.appointments-container {
+    background: #fff !important;
+}
+
+.profile-header input[type="file"].profile-photo-upload {
+    display: block;
+    margin: 0 auto 8px auto;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: #3498db;
+    color: #fff;
+    border: none;
+    font-size: 0.95rem;
+    cursor: pointer;
+    width: 120px;
+    text-align: center;
+}
+.profile-header input[type="file"].profile-photo-upload::-webkit-file-upload-button {
+    background: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+.profile-photo-preview {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+    box-shadow: 0 2px 8px #3498db22;
 }

@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const Appointment = require('../models/Appointment');
-const { protect, authorize } = require('../middleware/auth');
-const { validateAppointment } = require('../middleware/validator');
+const { auth, authorize } = require('../middleware/auth');
 const { sendAppointmentNotification } = require('../utils/email');
 
 // Tüm randevuları getir (filtreleme ve sayfalama ile)
-router.get('/', protect, async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
     const query = {};
     
@@ -61,7 +60,7 @@ router.get('/', protect, async (req, res) => {
 });
 
 // Yeni randevu oluştur
-router.post('/', protect, validateAppointment, async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
     const appointment = await Appointment.create({
       ...req.body,
@@ -84,7 +83,7 @@ router.post('/', protect, validateAppointment, async (req, res) => {
 });
 
 // Randevu detaylarını getir
-router.get('/:id', protect, async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id)
       .populate('job', 'title description')
@@ -121,7 +120,7 @@ router.get('/:id', protect, async (req, res) => {
 });
 
 // Randevu güncelle
-router.put('/:id', protect, async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   try {
     let appointment = await Appointment.findById(req.params.id);
 
@@ -172,7 +171,7 @@ router.put('/:id', protect, async (req, res) => {
 });
 
 // Randevu iptal et
-router.delete('/:id', protect, async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
 
@@ -219,7 +218,7 @@ router.delete('/:id', protect, async (req, res) => {
 });
 
 // Randevu hatırlatıcı gönder
-router.post('/:id/reminder', protect, async (req, res) => {
+router.post('/:id/reminder', auth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
 

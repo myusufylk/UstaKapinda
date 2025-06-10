@@ -2,11 +2,10 @@ class LiveSupport {
     constructor() {
         this.services = [
             { label: 'Randevu alma', value: 'randevu' },
-            { label: 'Fiyat bilgisi', value: 'fiyat' },
-            { label: 'Adres ve çalışma saatleri', value: 'adres' },
             { label: 'Sunulan servisler', value: 'servis' }
         ];
         this.awaiting = null; // Kullanıcıdan ek bilgi bekleniyor mu?
+        this.randevuData = {}; // Çok adımlı randevu için geçici veri
         this.initUI();
         this.initEvents();
     }
@@ -83,16 +82,31 @@ class LiveSupport {
     handleServiceClick(value, label) {
         this.addMessage(label, 'user');
         this.input.value = '';
-        // Senaryolu cevaplar
         if (value === 'randevu') {
-            this.addMessage('Hangi tarih ve saat için randevu almak istersiniz?', 'bot');
-            this.awaiting = 'randevu';
-        } else if (value === 'fiyat') {
-            this.addMessage('Hangi hizmetin fiyatını öğrenmek istersiniz? (ör: yağ değişimi, fren bakımı...)', 'bot');
-            this.awaiting = 'fiyat';
-        } else if (value === 'adres') {
-            this.addMessage('Adresimiz: Örnek Mah. Servis Sk. No:1, İstanbul<br>Çalışma saatlerimiz: Hafta içi 09:00-18:00, Cumartesi 09:00-14:00', 'bot');
-            this.awaiting = null;
+            this.randevuData = {};
+            // HİZMETLERİ BUTON OLARAK LİSTELE
+            const hizmetler = [
+                'Akü Servisi',
+                'Yağ Değişimi',
+                'Fren Bakımı',
+                'Genel Bakım',
+                'Elektrik & Elektronik',
+                'Kaporta & Boya'
+            ];
+            let msg = 'Hangi hizmet için randevu almak istersiniz?<br>';
+            hizmetler.forEach(hizmet => {
+                msg += `<button class='ls-hizmet-btn' data-hizmet='${hizmet}'>${hizmet}</button> `;
+            });
+            this.addMessage(msg, 'bot');
+            setTimeout(() => {
+                this.messages.querySelectorAll('.ls-hizmet-btn').forEach(btn => {
+                    btn.onclick = () => {
+                        this.awaiting = 'randevu_hizmet_btn';
+                        this.handleSend(btn.dataset.hizmet);
+                    };
+                });
+            }, 100);
+            this.awaiting = 'randevu_hizmet_btn';
         } else if (value === 'servis') {
             this.addMessage('Akü servisi, yağ değişimi, fren bakımı, genel bakım ve daha fazlası. Detaylı bilgi için birini seçebilirsiniz.', 'bot');
             this.awaiting = null;
@@ -118,24 +132,82 @@ class LiveSupport {
         this.messages.scrollTop = this.messages.scrollHeight;
     }
 
-    handleSend() {
-        const val = this.input.value.trim();
+    handleSend(valParam) {
+        const val = (typeof valParam === 'string') ? valParam : this.input.value.trim();
         if (!val) return;
         this.addMessage(val, 'user');
-        // Senaryolu cevaplar
-        if (this.awaiting === 'randevu') {
+        // Hizmet butonundan gelirse önce dükkanları listele
+        if (this.awaiting === 'randevu_hizmet_btn') {
+            this.randevuData.hizmet = val;
+            fetch(`/api/shops?service=${encodeURIComponent(val)}`)
+                .then(res => res.json())
+                .then(shops => {
+                    if (shops.length > 0) {
+                        let msg = 'Aşağıdaki dükkanlardan birini seçebilirsiniz:<br>';
+                        shops.forEach(shop => {
+                            msg += `<button class='ls-dukkans-btn' data-name='${shop.name}'>${shop.name} - ${shop.address}</button><br>`;
+                        });
+                        this.addMessage(msg, 'bot');
+                        setTimeout(() => {
+                            this.messages.querySelectorAll('.ls-dukkans-btn').forEach(btn => {
+                                btn.onclick = () => {
+                                    this.awaiting = 'randevu_dukkan_btn';
+                                    this.handleSend(btn.dataset.name);
+                                };
+                            });
+                        }, 100);
+                        this.awaiting = 'randevu_dukkan_btn';
+                    } else {
+                        this.addMessage('Üzgünüm, bu hizmeti sunan bir dükkan bulunamadı. Lütfen başka bir hizmet seçin.', 'bot');
+                        this.awaiting = 'randevu_hizmet_btn';
+                    }
+                });
+        } else if (this.awaiting === 'randevu_dukkan_btn') {
+            this.randevuData.dukkan = val;
             setTimeout(() => {
-                this.addMessage('Randevu talebiniz alındı! En kısa sürede onay için sizinle iletişime geçeceğiz.', 'bot');
-                this.awaiting = null;
-            }, 600);
-        } else if (this.awaiting === 'fiyat') {
-            // Basit örnek: yağ değişimi veya fren bakımı
-            let cevap = 'Bu hizmetin fiyatı için lütfen detay verin.';
-            if (val.toLowerCase().includes('yağ')) cevap = "Yağ değişimi fiyatımız 500 TL'dir.";
-            else if (val.toLowerCase().includes('fren')) cevap = "Fren bakımı fiyatımız 700 TL'dir.";
+                this.addMessage('Hangi tarih ve saat için randevu almak istersiniz?', 'bot');
+                this.awaiting = 'randevu_tarih';
+            }, 400);
+        } else if (this.awaiting === 'randevu_hizmet') {
+            // Elle hizmet yazılırsa da aynı akış
+            this.randevuData.hizmet = val;
+            fetch(`/api/shops?service=${encodeURIComponent(val)}`)
+                .then(res => res.json())
+                .then(shops => {
+                    if (shops.length > 0) {
+                        let msg = 'Aşağıdaki dükkanlardan birini seçebilirsiniz:<br>';
+                        shops.forEach(shop => {
+                            msg += `<button class='ls-dukkans-btn' data-name='${shop.name}'>${shop.name} - ${shop.address}</button><br>`;
+                        });
+                        this.addMessage(msg, 'bot');
+                        setTimeout(() => {
+                            this.messages.querySelectorAll('.ls-dukkans-btn').forEach(btn => {
+                                btn.onclick = () => {
+                                    this.input.value = btn.dataset.name;
+                                    this.awaiting = 'randevu_dukkan_btn';
+                                    this.handleSend();
+                                };
+                            });
+                        }, 100);
+                        this.awaiting = 'randevu_dukkan_btn';
+                    } else {
+                        this.addMessage('Üzgünüm, bu hizmeti sunan bir dükkan bulunamadı. Lütfen başka bir hizmet girin.', 'bot');
+                        this.awaiting = 'randevu_hizmet';
+                    }
+                });
+        } else if (this.awaiting === 'randevu_tarih') {
+            this.randevuData.tarih = val;
             setTimeout(() => {
-                this.addMessage(cevap, 'bot');
+                this.addMessage(
+                    `<b>Randevu Talebiniz Alındı!</b><br>
+                    <b>Hizmet:</b> ${this.randevuData.hizmet}<br>
+                    <b>Dükkan:</b> ${this.randevuData.dukkan}<br>
+                    <b>Tarih:</b> ${this.randevuData.tarih}<br>
+                    En kısa sürede onay için sizinle iletişime geçeceğiz.`,
+                    'bot'
+                );
                 this.awaiting = null;
+                this.randevuData = {};
             }, 600);
         }
         this.input.value = '';
