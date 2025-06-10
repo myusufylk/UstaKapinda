@@ -28,7 +28,40 @@ const io = socketIo(server, {
 // Middleware
 app.use(express.json());
 app.use(cors());
-app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://unpkg.com"],
+      styleSrc: ["'self'", "https://unpkg.com", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "https://cdn-icons-png.flaticon.com",
+        "https://a.tile.openstreetmap.org",
+        "https://b.tile.openstreetmap.org",
+        "https://c.tile.openstreetmap.org",
+        "https://tile.openstreetmap.org"
+      ],
+      connectSrc: [
+        "'self'",
+        "https://a.tile.openstreetmap.org",
+        "https://b.tile.openstreetmap.org",
+        "https://c.tile.openstreetmap.org",
+        "https://tile.openstreetmap.org"
+      ],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      objectSrc: ["'none'"],
+      frameSrc: ["'none'"]
+    },
+  })
+);
+app.use(
+  helmet({
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: false
+  })
+);
 app.use(mongoSanitize());
 app.use(xss());
 app.use(morgan('dev'));
@@ -63,6 +96,8 @@ const paymentRoutes = require('./routes/payments');
 const reviewRoutes = require('./routes/reviews');
 const notificationPreferencesRouter = require('./routes/notificationPreferences');
 const arizaTespitRouter = require('./routes/ariza-tespit');
+const appointmentRoutes = require('./routes/appointments');
+const shopRoutes = require('./routes/shops');
 
 app.use('/api/auth', authRoutes);
 app.use('/api', userRoutes);
@@ -74,6 +109,8 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/notification-preferences', notificationPreferencesRouter);
 app.use('/ariza-tespit', arizaTespitRouter);
+app.use('/api/appointments', appointmentRoutes);
+app.use('/api/shops', shopRoutes);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));

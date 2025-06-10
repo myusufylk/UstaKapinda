@@ -63,14 +63,15 @@ router.post('/register/user', userValidationRules(), validate, async (req, res) 
 // Dükkan kaydı
 router.post('/register/shop', shopValidationRules(), validate, async (req, res) => {
     try {
-        const { name, email, password, phone, address, services } = req.body;
-
+        let { name, email, password, phone, address, services } = req.body;
+        if (services && !Array.isArray(services)) {
+            services = [services];
+        }
         // Dükkan zaten var mı kontrol et
         const existingShop = await Shop.findOne({ email });
         if (existingShop) {
             return res.status(400).json({ error: 'Bu e-posta adresi zaten kayıtlı' });
         }
-
         // Yeni dükkan oluştur
         const shop = new Shop({
             name,
@@ -81,9 +82,7 @@ router.post('/register/shop', shopValidationRules(), validate, async (req, res) 
             services,
             isVerified: true // Doğrulamayı otomatik olarak true yapıyoruz
         });
-
         await shop.save();
-
         // Auth token oluştur
         const token = jwt.sign(
             { shopId: shop._id, type: 'shop' },

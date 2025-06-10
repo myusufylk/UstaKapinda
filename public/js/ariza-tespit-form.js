@@ -11,7 +11,17 @@ document.getElementById('findWorkshopBtn').addEventListener('click', function() 
     const mapDiv = document.getElementById('map');
     if(mapDiv) {
         mapDiv.style.display = 'block';
-        if(window.initRepairMap) window.initRepairMap();
+        // Kullanıcının seçtiği arıza türüne göre ilgili dükkan tipini belirle
+        const faultSymptom = document.getElementById('faultSymptom').value;
+        let shopType = 'genel';
+        if(faultSymptom === 'engine' || faultSymptom === 'mechanical') {
+            shopType = 'mekanik';
+        } else if(faultSymptom === 'electrical') {
+            shopType = 'elektrik';
+        } else if(faultSymptom === 'other') {
+            shopType = 'genel';
+        }
+        if(window.initRepairMap) window.initRepairMap(shopType);
     }
 });
 
@@ -19,12 +29,14 @@ document.getElementById('findWorkshopBtn').addEventListener('click', function() 
 document.getElementById('faultSymptom').addEventListener('change', function() {
     const speedLabel = document.getElementById('speedLabel');
     const speedInput = document.getElementById('carSpeed');
-    if(this.value === 'collision') {
-        speedLabel.style.display = 'block';
-        speedInput.style.display = 'block';
-    } else {
-        speedLabel.style.display = 'none';
-        speedInput.style.display = 'none';
+    if (speedLabel && speedInput) {
+        if(this.value === 'collision') {
+            speedLabel.style.display = 'block';
+            speedInput.style.display = 'block';
+        } else {
+            speedLabel.style.display = 'none';
+            speedInput.style.display = 'none';
+        }
     }
 });
 
@@ -122,12 +134,14 @@ function submitForm(e) {
     e.preventDefault();
     if(!validateSection(currentSection)) return;
     // Arıza türünü belirle
-    const faultAreas = Array.from(document.querySelectorAll('input[name="faultAreas"]:checked')).map(el => el.value);
+    const faultSymptom = document.getElementById('faultSymptom').value;
     let faultType = 'genel';
-    if(faultAreas.includes('engine') || faultAreas.includes('chassis')) {
+    if(faultSymptom === 'engine' || faultSymptom === 'mechanical') {
         faultType = 'mekanik';
-    } else if(faultAreas.some(area => ['frontBumper', 'rearBumper', 'rightFrontDoor', 'leftRearDoor'].includes(area))) {
-        faultType = 'karoseri';
+    } else if(faultSymptom === 'electrical') {
+        faultType = 'elektrik';
+    } else if(faultSymptom === 'other') {
+        faultType = 'genel';
     }
     // Sonuç ekranını göster
     document.getElementById('faultForm').style.display = 'none';
@@ -136,21 +150,19 @@ function submitForm(e) {
     const resultContent = document.getElementById('resultContent');
     resultContent.innerHTML = `
         <p><strong>Araç Bilgisi:</strong> ${document.getElementById('carBrand').options[document.getElementById('carBrand').selectedIndex].text} ${document.getElementById('carModel').value} (${document.getElementById('carYear').value})</p>
-        <p><strong>Arıza Türü:</strong> ${faultType === 'mekanik' ? 'Mekanik Problem' : faultType === 'karoseri' ? 'Karoseri Arıza' : 'Genel Arıza'}</p>
+        <p><strong>Arıza Türü:</strong> ${faultType === 'mekanik' ? 'Mekanik Problem' : faultType === 'elektrik' ? 'Elektrik Arızası' : 'Genel Arıza'}</p>
         <p><strong>Arıza Açıklaması:</strong> ${document.getElementById('faultDescription').value}</p>
-        <p><strong>Tahmini Tamir Kategorisi:</strong> ${getRepairCategory(faultType, [])}</p>
+        <p><strong>Tahmini Tamir Kategorisi:</strong> ${getRepairCategory(faultType)}</p>
         <p><strong>Önerilen Tamirci Sayısı:</strong> ${getRecommendedWorkshops(faultType).length}</p>
     `;
 }
 
 // Tamir kategorisi belirleme
-function getRepairCategory(type, areas) {
+function getRepairCategory(type) {
     if(type === 'mekanik') {
-        return 'Yetkili Servis veya Motor Uzmanı';
-    } else if(areas.includes('windshield')) {
-        return 'Cam Uzmanı';
-    } else if(type === 'karoseri') {
-        return 'Kaporta ve Boya Ustası';
+        return 'Yetkili Servis veya Motor/Mekanik Uzmanı';
+    } else if(type === 'elektrik') {
+        return 'Oto Elektrikçi';
     }
     return 'Genel Tamirci';
 }
@@ -161,7 +173,8 @@ function getRecommendedWorkshops(type) {
         {name: "Oto Motor Tamir", expertise: ["mekanik"], distance: "1.2 km"},
         {name: "Kaporta Center", expertise: ["karoseri"], distance: "0.8 km"},
         {name: "Camcı Ali Usta", expertise: ["genel", "cam"], distance: "2.1 km"},
-        {name: "Total Car Care", expertise: ["mekanik", "karoseri", "genel"], distance: "3.5 km"}
+        {name: "Total Car Care", expertise: ["mekanik", "karoseri", "genel"], distance: "3.5 km"},
+        {name: "Elektrikçi Mehmet", expertise: ["elektrik"], distance: "1.5 km"}
     ];
     return workshops.filter(ws => ws.expertise.includes(type));
 } 

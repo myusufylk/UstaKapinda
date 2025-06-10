@@ -23,6 +23,17 @@ const shopSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number],
+            required: false
+        }
+    },
     services: [{
         type: String
     }],
@@ -46,6 +57,10 @@ const shopSchema = new mongoose.Schema({
         friday: { start: String, end: String },
         saturday: { start: String, end: String },
         sunday: { start: String, end: String }
+    },
+    isOpen: {
+        type: Boolean,
+        default: true
     },
     createdAt: {
         type: Date,

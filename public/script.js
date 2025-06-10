@@ -267,8 +267,9 @@ window.addEventListener('DOMContentLoaded', function() {
         ctaButton.addEventListener('click', () => {
             const token = localStorage.getItem('token');
             if (token) {
-                // Kullanıcı giriş yapmışsa randevu modalını aç
-                alert('Randevu sistemi yakında aktif olacak!');
+                // Kullanıcı giriş yapmışsa chatbotu aç
+                const chatbotBtn = document.querySelector('.livesupport-emoji');
+                if(chatbotBtn) chatbotBtn.click();
             } else {
                 // Kullanıcı giriş yapmamışsa giriş modalını aç
                 loginModal.style.display = 'block';
@@ -284,8 +285,7 @@ window.addEventListener('DOMContentLoaded', function() {
             userDropdown.innerHTML = `
                 <span class="user-name">${userName}</span>
                 <a href="#" id="openAccount">Hesabım</a>
-                <a href="#" id="openMessages">Mesajlarım</a>
-                ${userType === 'shop' ? '<a href="#" id="openAppointments">Randevularım</a>' : ''}
+                <a href="#" id="openAppointments">Randevularım</a>
                 <a href="#" id="logout">Çıkış Yap</a>
             `;
 
@@ -299,6 +299,24 @@ window.addEventListener('DOMContentLoaded', function() {
                     localStorage.removeItem('userId');
                     localStorage.removeItem('userName');
                     window.location.reload();
+                });
+            }
+
+            // Randevularım yönlendirme
+            const appointmentsBtn = document.getElementById('openAppointments');
+            if (appointmentsBtn) {
+                appointmentsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = '/appointments.html';
+                });
+            }
+
+            // Hesabım yönlendirme
+            const accountBtn = document.getElementById('openAccount');
+            if (accountBtn) {
+                accountBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = '/profile.html';
                 });
             }
         }

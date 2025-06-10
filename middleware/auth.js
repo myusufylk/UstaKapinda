@@ -1,25 +1,35 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Shop = require('../models/Shop');
 
 const auth = async (req, res, next) => {
     try {
+        console.log('auth middleware çalıştı');
         const token = req.header('Authorization')?.replace('Bearer ', '');
-        
-        if (!token) {
-            throw new Error();
-        }
+        if (!token) throw new Error();
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findOne({ _id: decoded.userId });
+        console.log('decoded:', decoded);
 
-        if (!user) {
-            throw new Error();
+        if (decoded.type === 'shop' && decoded.shopId) {
+            const shop = await Shop.findById(decoded.shopId);
+            if (!shop) throw new Error();
+            req.token = token;
+            req.user = { ...shop.toObject(), type: 'shop', shopId: shop._id };
+            return next();
         }
 
-        req.token = token;
-        req.user = user;
-        next();
+        if (decoded.type === 'user' && decoded.userId) {
+            const user = await User.findById(decoded.userId);
+            if (!user) throw new Error();
+            req.token = token;
+            req.user = { ...user.toObject(), type: 'user', userId: user._id };
+            return next();
+        }
+
+        throw new Error();
     } catch (error) {
+        console.error('auth middleware hata:', error);
         res.status(401).json({ error: 'Please authenticate.' });
     }
 };
